@@ -35,6 +35,9 @@ public class ShooterTuner extends LinearOpMode {
             } else {
                 shooter.setTargetVelocity(RotationsPerMinute.of(DESIRED_POWER_OR_RPM));
             }
+
+            telemetry.addData("Shooter RPM", shooter.getCurrentVelocity().into(RotationsPerMinute));
+            telemetry.addData("Target Shooter RPM", DESIRED_POWER_OR_RPM);
         }
     }
 

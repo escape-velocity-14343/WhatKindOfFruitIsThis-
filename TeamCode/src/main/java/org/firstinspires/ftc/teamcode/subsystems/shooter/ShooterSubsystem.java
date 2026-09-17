@@ -70,6 +70,10 @@ public class ShooterSubsystem extends SubsystemBase {
         this.targetVelocity = targetVelocity;
     }
 
+    public AngularVelocity getCurrentVelocity() {
+        return this.currentVelocity;
+    }
+
     public void setPower(double power) {
         shooterMotor.setPower(power);
     }
