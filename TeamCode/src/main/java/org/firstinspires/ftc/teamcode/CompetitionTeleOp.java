@@ -1,16 +1,25 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.shooter.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.TransferSubsystem;
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp
-public class TeleOp extends LinearOpMode {
+import org.firstinspires.ftc.teamcode.util.Logger;
+
+@TeleOp(name = "TeleOp")
+public class CompetitionTeleOp extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), telemetry);
+        Logger.start(this);
+
         IntakeSubsystem intake = new IntakeSubsystem(hardwareMap);
         TransferSubsystem transfer = new TransferSubsystem(hardwareMap);
         ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap);
@@ -19,6 +28,8 @@ public class TeleOp extends LinearOpMode {
         boolean lastA = false;
         waitForStart();
         while (opModeIsActive()) {
+            CommandScheduler.getInstance().run();
+
             drive.drive(gamepad1.left_stick_y, -gamepad1.left_stick_x, gamepad1.right_stick_x);
 
             if (gamepad1.right_bumper) {

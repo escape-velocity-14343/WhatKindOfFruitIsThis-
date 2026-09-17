@@ -24,9 +24,23 @@ android {
     }
 }
 
+repositories {
+    maven {
+        url "https://repo.dairy.foundation/releases"
+    }
+    maven {
+        url "https://central.sonatype.com/repository/maven-snapshots/"
+    }
+    maven {
+        url 'https://maven.brott.dev/'
+    }
+}
+
 dependencies {
     implementation project(':FtcRobotController')
 
+    implementation 'com.acmerobotics.dashboard:dashboard:0.6.0'
+    implementation 'gay.zharel.fateweaver:ftc:0.4.1'
+    implementation 'dev.nextftc.v2:control:0.2.0'
     implementation 'org.ftclib.ftclib:core:2.1.1'
-
 }
