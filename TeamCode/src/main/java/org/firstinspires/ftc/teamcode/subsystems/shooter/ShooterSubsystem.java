@@ -8,11 +8,14 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import dev.nextftc.units.measuretypes.AngularVelocity;
+import gay.zharel.fastlane.VoltageCache;
 import gay.zharel.fateweaver.flight.FlightRecorder;
 import gay.zharel.fateweaver.log.FateLogWriter;
 import org.firstinspires.ftc.teamcode.util.Logger;
 
 import static dev.nextftc.units.Units.*;
+import static gay.zharel.fastlane.UnitsKt.AppliedThrottle;
+import static gay.zharel.fastlane.UnitsKt.Throttle;
 
 @Config
 public class ShooterSubsystem extends SubsystemBase {
@@ -40,6 +43,8 @@ public class ShooterSubsystem extends SubsystemBase {
     public ShooterSubsystem(HardwareMap hardwareMap) {
         shooterMotor = hardwareMap.get(DcMotorEx.class, "intake");
         shooterMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        VoltageCache.init(hardwareMap);
     }
 
     @Override
@@ -53,9 +58,9 @@ public class ShooterSubsystem extends SubsystemBase {
                 // update controller coeffs
                 velPid.setPID(kP, 0.0, kD);
                 velFF = new SimpleMotorFeedforward(0.0, kV, 0.0);
-                setPower(velFF.calculate(targetVelocity.into(RotationsPerSecond))
+                setPower(Throttle.of(velFF.calculate(targetVelocity.into(RotationsPerSecond))
                         + velPid.calculate(currentVelocity.into(RotationsPerSecond),
-                        targetVelocity.into(RotationsPerSecond)));
+                        targetVelocity.into(RotationsPerSecond))).into(AppliedThrottle));
                 break;
             case DISABLED:
             case POWER_ONLY:
