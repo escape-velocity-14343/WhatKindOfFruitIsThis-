@@ -19,9 +19,6 @@ apply plugin: 'org.jetbrains.kotlin.android'
 
 android {
     namespace = 'org.firstinspires.ftc.teamcode'
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
 
     packagingOptions {
         jniLibs.useLegacyPackaging true
@@ -47,5 +44,4 @@ dependencies {
     implementation 'gay.zharel.fateweaver:ftc:0.4.1'
     implementation 'dev.nextftc.v2:control:0.2.0'
     implementation 'org.ftclib.ftclib:core:2.1.1'
-    implementation 'androidx.core:core-ktx:1.19.0'
 }

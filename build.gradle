@@ -32,8 +32,6 @@ allprojects {
     }
 }
 
-
-
 repositories {
     mavenCentral()
 }
