@@ -38,11 +38,13 @@ public class ShooterSubsystem extends SubsystemBase {
     private AngularVelocity targetVelocity = RotationsPerMinute.of(0.0);
     private AngularVelocity currentVelocity = RotationsPerSecond.of(0.0);
 
-    DcMotorEx shooterMotor;
+    DcMotorEx shooterMotor, shooterMotor2;
     boolean on = false;
     public ShooterSubsystem(HardwareMap hardwareMap) {
-        shooterMotor = hardwareMap.get(DcMotorEx.class, "intake");
+        shooterMotor = hardwareMap.get(DcMotorEx.class, "shooterMotorRight");
         shooterMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        shooterMotor2 = hardwareMap.get(DcMotorEx.class, "shooterMotorLeft");
 
         VoltageCache.init(hardwareMap);
     }
@@ -81,6 +83,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void setPower(double power) {
         shooterMotor.setPower(power);
+        shooterMotor2.setPower(power);
     }
 
     public void on() {
