@@ -41,10 +41,10 @@ public class ShooterSubsystem extends SubsystemBase {
     DcMotorEx shooterMotor, shooterMotor2;
     boolean on = false;
     public ShooterSubsystem(HardwareMap hardwareMap) {
-        shooterMotor = hardwareMap.get(DcMotorEx.class, "shooterMotorRight");
+        shooterMotor = hardwareMap.get(DcMotorEx.class, "shooterMotorLeft");
         shooterMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        shooterMotor2 = hardwareMap.get(DcMotorEx.class, "shooterMotorLeft");
+        shooterMotor2 = hardwareMap.get(DcMotorEx.class, "shooterMotorRight");
 
         VoltageCache.init(hardwareMap);
     }
