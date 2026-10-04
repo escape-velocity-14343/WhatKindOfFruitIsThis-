@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems.shooter;
+package org.firstinspires.ftc.teamcode.subsystems.intake;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -8,34 +8,31 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Utility;
 import org.firstinspires.ftc.teamcode.util.Logger;
 
-import static dev.nextftc.units.Units.RotationsPerMinute;
-
 @Utility
 @Config
-public class ShooterTuner extends LinearOpMode {
+public class IntakeTuner extends LinearOpMode {
 
-    public static double desiredPowerOrRpm = 0.0;
+    public static double power = 0.0;
+    public static IntakeSubsystem.PivotState pivotState = IntakeSubsystem.PivotState.UP;
 
     @Override
     public void runOpMode() {
         telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), telemetry);
         Logger.start(this);
 
-        ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap);
+        IntakeSubsystem intake = new IntakeSubsystem(hardwareMap);
 
         waitForStart();
 
         while (opModeIsActive()) {
             CommandScheduler.getInstance().run();
 
-            if (ShooterSubsystem.mode == ShooterSubsystem.ShooterMode.POWER_ONLY) {
-                shooter.setPower(desiredPowerOrRpm);
-            } else {
-                shooter.setTargetVelocity(RotationsPerMinute.of(desiredPowerOrRpm));
-            }
+            intake.setPower(power);
+            intake.setPivot(pivotState);
 
-            telemetry.addData("Shooter RPM", shooter.getCurrentVelocity().into(RotationsPerMinute));
-            telemetry.addData("Target Shooter RPM", desiredPowerOrRpm);
+            telemetry.addData("Intake Power", power);
+            telemetry.addData("Pivot Pos", pivotState.pos);
+            telemetry.addData("Pivot State", pivotState.name());
 
             telemetry.update();
         }
