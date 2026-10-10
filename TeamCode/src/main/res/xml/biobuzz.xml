@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<Robot type="FirstInspires-FTC">
+    <LynxUsbDevice name="Control Hub Portal" serialNumber="(embedded)" parentModuleAddress="173">
+        <LynxModule name="Expansion Hub" port="2">
+            <goBILDA5202SeriesMotor name="intakeMotor" port="0" />
+            <goBILDA5202SeriesMotor name="transferMotor" port="1" />
+        </LynxModule>
+        <LynxModule name="Control Hub" port="173">
+            <goBILDA5202SeriesMotor name="driveFrontLeft" port="0" />
+            <goBILDA5202SeriesMotor name="driveFrontRight" port="1" />
+            <goBILDA5202SeriesMotor name="driveBackLeft" port="2" />
+            <goBILDA5202SeriesMotor name="driveBackRight" port="3" />
+            <LynxEmbeddedIMU name="imu" port="0" bus="0" />
+        </LynxModule>
+    </LynxUsbDevice>
+</Robot>

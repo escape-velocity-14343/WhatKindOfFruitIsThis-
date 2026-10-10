@@ -18,10 +18,10 @@ public class MecanumDriveSubsystem extends SubsystemBase {
     DoubleSupplier heading;
 
     public MecanumDriveSubsystem (HardwareMap hwMap, DoubleSupplier headingSupplier) {
-        frontLeftMotor = hwMap.dcMotor.get("front left");
-        backLeftMotor = hwMap.dcMotor.get("back left");
-        frontRightMotor = hwMap.dcMotor.get("front right");
-        backRightMotor = hwMap.dcMotor.get("back right");
+        frontLeftMotor = hwMap.dcMotor.get("driveFrontLeft");
+        backLeftMotor = hwMap.dcMotor.get("driveBackLeft");
+        frontRightMotor = hwMap.dcMotor.get("driveFrontRight");
+        backRightMotor = hwMap.dcMotor.get("driveBackRight");
         heading = headingSupplier;
 
         // Reverse the right side motors. This may be wrong for your setup.

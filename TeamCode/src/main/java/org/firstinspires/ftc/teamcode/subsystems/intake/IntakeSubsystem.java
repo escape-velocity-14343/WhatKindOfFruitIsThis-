@@ -25,8 +25,8 @@ public class IntakeSubsystem extends SubsystemBase {
     private final DcMotorEx intakeMotor;
     private Servo intakePivot;
     public IntakeSubsystem(HardwareMap hardwareMap) {
-        intakeMotor = hardwareMap.get(DcMotorEx.class, "shooter");
-        intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
+//        intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // intakePivot = hardwareMap.servo.get("intake pivot");
     }
@@ -48,13 +48,13 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void on() {
-        setPower(1.0);
+        setPower(0.7);
     }
     public void off() {
         setPower(0.0);
     }
     public void reverse() {
-        setPower(-1.0);
+        setPower(-0.7);
     }
     public void down() {
         setPivot(PivotState.DOWN);

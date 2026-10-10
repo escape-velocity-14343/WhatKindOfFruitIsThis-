@@ -6,6 +6,7 @@ import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.ShooterSubsystem;
@@ -22,7 +23,7 @@ public class CompetitionTeleOp extends LinearOpMode {
 
         IntakeSubsystem intake = new IntakeSubsystem(hardwareMap);
         TransferSubsystem transfer = new TransferSubsystem(hardwareMap);
-        ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap);
+//        ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap);
         MecanumDriveSubsystem drive = new MecanumDriveSubsystem(hardwareMap, () -> 0.0);
 
         boolean lastA = false;
@@ -38,12 +39,15 @@ public class CompetitionTeleOp extends LinearOpMode {
                 intake.off();
             }
 
-            shooter.setPower(gamepad1.right_trigger);
+//            shooter.setPower(gamepad1.right_trigger);
 
-            if (gamepad1.left_bumper) {
-                transfer.on();
-            }
-            else {
+            if (gamepad1.right_trigger > 0.05) {
+                transfer.reject();
+            } else if (gamepad1.left_bumper) {
+                transfer.intake();
+            } else if (gamepad1.a) {
+                transfer.transfer();
+            } else {
                 transfer.off();
             }
 
