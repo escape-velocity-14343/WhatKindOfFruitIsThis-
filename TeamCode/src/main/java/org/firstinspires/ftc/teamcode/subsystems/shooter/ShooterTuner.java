@@ -6,15 +6,29 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Utility;
+import gay.zharel.fateweaver.flight.FlightRecorder;
+import org.firstinspires.ftc.teamcode.subsystems.TransferSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.CounterrollerSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.FlywheelBaseSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.FlywheelSubsystem;
 import org.firstinspires.ftc.teamcode.util.Logger;
 
+import java.util.Objects;
+
+import static dev.nextftc.units.Units.Degrees;
 import static dev.nextftc.units.Units.RotationsPerMinute;
 
 @Utility
 @Config
 public class ShooterTuner extends LinearOpMode {
 
-    public static double desiredPowerOrRpm = 0.0;
+    public static double flywheelPowerOrRpm = 0.0;
+    public static double counterrollerPowerOrRpm = 0.0;
+    public static double hoodDegrees = 0.0;
+    public static boolean enableIntakeTransfer = true;
+    private IntakeSubsystem intake = null;
+    private TransferSubsystem transfer = null;
 
     @Override
     public void runOpMode() {
@@ -23,19 +37,43 @@ public class ShooterTuner extends LinearOpMode {
 
         ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap);
 
+        if (enableIntakeTransfer) {
+            intake = new IntakeSubsystem(hardwareMap);
+            transfer = new TransferSubsystem(hardwareMap);
+        }
+
         waitForStart();
 
         while (opModeIsActive()) {
             CommandScheduler.getInstance().run();
 
-            if (ShooterSubsystem.mode == ShooterSubsystem.ShooterMode.POWER_ONLY) {
-                shooter.setPower(desiredPowerOrRpm);
+            if (FlywheelSubsystem.config.mode == FlywheelBaseSubsystem.FlywheelMode.POWER_ONLY) {
+                shooter.flywheel.setPower(flywheelPowerOrRpm);
             } else {
-                shooter.setTargetVelocity(RotationsPerMinute.of(desiredPowerOrRpm));
+                shooter.flywheel.setTargetVelocity(RotationsPerMinute.of(flywheelPowerOrRpm));
             }
 
-            telemetry.addData("Shooter RPM", shooter.getCurrentVelocity().into(RotationsPerMinute));
-            telemetry.addData("Target Shooter RPM", desiredPowerOrRpm);
+            if (CounterrollerSubsystem.config.mode == FlywheelBaseSubsystem.FlywheelMode.POWER_ONLY) {
+                shooter.rollers.setPower(counterrollerPowerOrRpm);
+            } else {
+                shooter.rollers.setTargetVelocity(RotationsPerMinute.of(counterrollerPowerOrRpm));
+            }
+
+            if (enableIntakeTransfer) {
+                intake.on();
+                transfer.transfer();
+            } else if (!Objects.isNull(intake)) {
+                intake.off();
+                transfer.off();
+            }
+
+            shooter.hood.setAngle(Degrees.of(hoodDegrees));
+
+            telemetry.addData("Flywheel RPM", shooter.flywheel.getCurrentVelocity().into(RotationsPerMinute));
+            telemetry.addData("Target Flywheel RPM", flywheelPowerOrRpm);
+
+            telemetry.addData("Counterroller RPM", shooter.rollers.getCurrentVelocity().into(RotationsPerMinute));
+            telemetry.addData("Target Counterroller RPM", counterrollerPowerOrRpm);
 
             telemetry.update();
         }

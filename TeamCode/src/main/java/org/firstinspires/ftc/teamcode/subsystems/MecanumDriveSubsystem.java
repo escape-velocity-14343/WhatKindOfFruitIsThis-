@@ -29,7 +29,8 @@ public class MecanumDriveSubsystem extends SubsystemBase {
         // reverse the left side instead.
         // See the note about this earlier on this page.
         frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
     /**
      * Mecanum drive method for holonomic robot control.
