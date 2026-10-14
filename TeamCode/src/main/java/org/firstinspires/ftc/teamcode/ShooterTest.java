@@ -31,6 +31,9 @@ public class ShooterTest extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
             CommandScheduler.getInstance().run();
+            telemetry.addData("Left Current", shooter.get_left_current());
+            telemetry.addData("Right Current", shooter.get_right_current());
+            telemetry.update();
         }
     }
 }
