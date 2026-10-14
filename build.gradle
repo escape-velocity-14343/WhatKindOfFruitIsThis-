@@ -6,8 +6,8 @@
 
 buildscript {
     ext {
-        kotlin_version = '2.4.20'
-    }
+        kotlin_version = '2.3.20'
+    }   
     repositories {
         mavenCentral()
         google()
@@ -19,8 +19,8 @@ buildscript {
 
 plugins {
     // Note for FTC Teams: Do not modify this yourself.
-    id 'com.android.application' version '8.13.2' apply false
-    id 'com.android.library' version '8.13.2' apply false
+    id 'com.android.application' version '8.10.1' apply false
+    id 'com.android.library' version '8.10.1' apply false
 }
 
 // This is now required because aapt2 has to be downloaded from the
