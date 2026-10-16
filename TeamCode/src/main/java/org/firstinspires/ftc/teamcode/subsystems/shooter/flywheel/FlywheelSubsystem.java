@@ -10,12 +10,12 @@ import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.FlywheelBaseSu
 @Config
 public class FlywheelSubsystem extends FlywheelBaseSubsystem {
     public static FlywheelConfiguration config = new FlywheelConfiguration(
-            0.0,
-            0.0,
-            0.0,
+            0.009,
+            0.05,
+            0.001,
             0.0,
             1.0 / 28.0,
-            FlywheelMode.POWER_ONLY,
+            FlywheelMode.VELOCITY_CONTROL,
             "Flywheel"
     );
     public FlywheelSubsystem(HardwareMap hardwareMap) {

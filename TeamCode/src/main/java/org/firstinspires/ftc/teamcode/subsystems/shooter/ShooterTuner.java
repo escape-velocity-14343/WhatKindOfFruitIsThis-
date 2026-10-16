@@ -4,16 +4,20 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Utility;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import gay.zharel.fateweaver.flight.FlightRecorder;
 import org.firstinspires.ftc.teamcode.subsystems.TransferSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.Turret.TurretSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.CounterrollerSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.FlywheelBaseSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.FlywheelSubsystem;
 import org.firstinspires.ftc.teamcode.util.Logger;
 
+import java.util.List;
 import java.util.Objects;
 
 import static dev.nextftc.units.Units.Degrees;
@@ -33,10 +37,18 @@ public class ShooterTuner extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        CommandScheduler.getInstance().reset();
+
+        List<LynxModule> hubs = hardwareMap.getAll(LynxModule.class);
+        for (LynxModule hub : hubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
+
         telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), telemetry);
         Logger.start(this);
 
         ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap);
+        TurretSubsystem turret = new TurretSubsystem(hardwareMap);
 
         if (enableIntakeTransfer) {
             intake = new IntakeSubsystem(hardwareMap);
@@ -46,6 +58,10 @@ public class ShooterTuner extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
+            for (LynxModule hub : hubs) {
+                hub.clearBulkCache();
+            }
+
             CommandScheduler.getInstance().run();
 
             if (FlywheelSubsystem.config.mode == FlywheelBaseSubsystem.FlywheelMode.POWER_ONLY) {
@@ -69,6 +85,7 @@ public class ShooterTuner extends LinearOpMode {
             }
 
             shooter.hood.setAngle(Degrees.of(hoodDegrees));
+            turret.setDegrees(0);
 
             telemetry.addData("Flywheel RPM", shooter.flywheel.getCurrentVelocity().into(RotationsPerMinute));
             telemetry.addData("Target Flywheel RPM", flywheelPowerOrRpm);

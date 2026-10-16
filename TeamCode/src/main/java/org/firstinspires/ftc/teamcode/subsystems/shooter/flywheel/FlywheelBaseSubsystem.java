@@ -73,8 +73,8 @@ public class FlywheelBaseSubsystem extends SubsystemBase {
                 velPid.setPID(config.kP, 0.0, config.kD);
                 velFF = new SimpleMotorFeedforward(config.kS, config.kV, 0.0);
                 setPower(Throttle.of(velFF.calculate(targetVelocity.into(RotationsPerSecond))
-                        + velPid.calculate(currentVelocity.into(RotationsPerSecond),
-                        targetVelocity.into(RotationsPerSecond))).into(AppliedThrottle));
+                        + velPid.calculate(currentVelocity.into(RotationsPerMinute),
+                        targetVelocity.into(RotationsPerMinute))).into(AppliedThrottle));
                 break;
             case DISABLED:
             case POWER_ONLY:
@@ -90,6 +90,7 @@ public class FlywheelBaseSubsystem extends SubsystemBase {
     }
 
     public AngularVelocity getCurrentVelocity() {
+//        return this.flywheelMotors.get(0).getCurrentPosition();
         return this.currentVelocity;
     }
 
