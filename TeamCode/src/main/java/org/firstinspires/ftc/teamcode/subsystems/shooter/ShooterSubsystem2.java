@@ -27,15 +27,21 @@ public class ShooterSubsystem2 {
     private DcMotorEx encoderMotor;
 
     public ShooterSubsystem2 (HardwareMap hwMap){
-        shooterMotorRight = (DcMotorEx) hwMap.get(DcMotor.class, "shooterMotorRight");
-        shooterMotorLeft = (DcMotorEx) hwMap.get(DcMotor.class, "shooterMotorLeft");
+        shooterMotorRight = (DcMotorEx) hwMap.get(DcMotor.class, "flywheelMotor");
+        shooterMotorLeft = (DcMotorEx) hwMap.get(DcMotor.class, "counterrollerMotor");
     }
-    public void on_left(){
-        shooterMotorLeft.setPower(0.5);
+
+    public void setPower(double power){
+        shooterMotorRight.setPower(power);
+        shooterMotorLeft.setPower(-power);
+
     }
-    public void off_left(){
-        shooterMotorLeft.setPower(0);
-    }
+    //public void on_left(){
+    //    shooterMotorLeft.setPower(0.5);
+    //}
+    //public void off_left(){
+    //    shooterMotorLeft.setPower(0);
+    //}
     public void on_right() {
         shooterMotorRight.setPower(-0.5);
     }
@@ -44,9 +50,9 @@ public class ShooterSubsystem2 {
         return shooterMotorRight.getCurrent(CurrentUnit.AMPS);
     }
 
-    public double get_left_current() {
-        return shooterMotorLeft.getCurrent(CurrentUnit.AMPS);
-    }
+    //public double get_left_current() {
+    //    return shooterMotorLeft.getCurrent(CurrentUnit.AMPS);
+    //}
     public void off_right(){
         shooterMotorRight.setPower(0);
     }

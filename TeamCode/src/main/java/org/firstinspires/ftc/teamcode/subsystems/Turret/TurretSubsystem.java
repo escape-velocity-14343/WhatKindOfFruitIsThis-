@@ -1,17 +1,24 @@
 package org.firstinspires.ftc.teamcode.subsystems.Turret;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.arcrobotics.ftclib.hardware.ServoEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 @Config
 public class TurretSubsystem {
-    private Servo turretServo1;
-    private Servo turretServo2;
+    private ServoImplEx turretServo1;
+    private ServoImplEx turretServo2;
 
     public TurretSubsystem(HardwareMap hardwareMap) {
-        turretServo1 = hardwareMap.get(Servo.class, "");
-        turretServo2 = hardwareMap.get(Servo.class, "turretServo2");
+        turretServo1 = (ServoImplEx) hardwareMap.get(Servo.class, "turret1");
+        turretServo2 = (ServoImplEx) hardwareMap.get(Servo.class, "turret2");
+        PwmControl.PwmRange pwmRange = new PwmControl.PwmRange(544, 2472);
+        turretServo1.setPwmRange(pwmRange);
+        turretServo2.setPwmRange(pwmRange);
+
     }
 
     public void setPos(double position){

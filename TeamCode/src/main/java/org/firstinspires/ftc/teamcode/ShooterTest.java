@@ -27,11 +27,11 @@ public class ShooterTest extends LinearOpMode {
         GamepadEx controller = new GamepadEx(gamepad1);
 
         controller.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenPressed(new InstantCommand(() -> shooter.on_right()));
-        controller.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whenPressed(new InstantCommand(() -> shooter.on_left()));
+        //controller.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whenPressed(new InstantCommand(() -> shooter.on_left()));
         waitForStart();
         while (opModeIsActive()) {
             CommandScheduler.getInstance().run();
-            telemetry.addData("Left Current", shooter.get_left_current());
+            //telemetry.addData("Left Current", shooter.get_left_current());
             telemetry.addData("Right Current", shooter.get_right_current());
             telemetry.update();
         }

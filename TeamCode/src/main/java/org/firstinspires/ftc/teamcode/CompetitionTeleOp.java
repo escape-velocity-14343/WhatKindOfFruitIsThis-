@@ -6,13 +6,18 @@ import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import org.firstinspires.ftc.teamcode.subsystems.Turret.TurretSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.TransferSubsystem;
+//import org.firstinspires.ftc.teamcode.subsystems.shooter.ShooterSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.shooter.ShooterSubsystem2;
 import org.firstinspires.ftc.teamcode.util.Logger;
 
 @TeleOp(name = "TeleOp")
 public class CompetitionTeleOp extends LinearOpMode {
+    int turretAngle = 180;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -21,13 +26,16 @@ public class CompetitionTeleOp extends LinearOpMode {
 
         IntakeSubsystem intake = new IntakeSubsystem(hardwareMap);
         TransferSubsystem transfer = new TransferSubsystem(hardwareMap);
-//        ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap);
+        ShooterSubsystem2 shooter = new ShooterSubsystem2(hardwareMap);
         MecanumDriveSubsystem drive = new MecanumDriveSubsystem(hardwareMap, () -> 0.0);
+        TurretSubsystem turret = new TurretSubsystem(hardwareMap);
 
         boolean lastA = false;
         waitForStart();
         while (opModeIsActive()) {
             CommandScheduler.getInstance().run();
+            turret.setDegrees(turretAngle);
+            telemetry.addData("Turret Angle", turretAngle);
 
             drive.drive(gamepad1.left_stick_y, -gamepad1.left_stick_x, gamepad1.right_stick_x);
 
@@ -37,11 +45,20 @@ public class CompetitionTeleOp extends LinearOpMode {
                 intake.off();
             }
 
-//            shooter.setPower(gamepad1.right_trigger);
+            shooter.setPower(gamepad1.right_trigger);
 
-            if (gamepad1.right_trigger > 0.05) {
-                transfer.reject();
-            } else if (gamepad1.left_bumper) {
+            if (gamepad1.dpadLeftWasReleased()){
+                turretAngle -= 5;
+            }
+
+            if (gamepad1.dpadRightWasReleased()){
+                turretAngle += 5;
+            }
+
+            //if (gamepad1.right_trigger > 0.05) {
+            //    transfer.reject();
+            //} else
+            if (gamepad1.left_bumper) {
                 transfer.intake();
             } else if (gamepad1.a) {
                 transfer.transfer();
@@ -50,6 +67,7 @@ public class CompetitionTeleOp extends LinearOpMode {
             }
 
             lastA = gamepad1.a;
+            telemetry.update();
         }
     }
 }

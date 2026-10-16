@@ -21,6 +21,7 @@ import static dev.nextftc.units.Units.RotationsPerMinute;
 
 @Utility
 @Config
+
 public class ShooterTuner extends LinearOpMode {
 
     public static double flywheelPowerOrRpm = 0.0;
