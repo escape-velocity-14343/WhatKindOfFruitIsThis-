@@ -7,6 +7,7 @@
             <goBILDA5202SeriesMotor name="counterrollerMotor" port="2" />
             <goBILDA5202SeriesMotor name="flywheelMotor" port="3" />
             <Servo name="hoodServo" port="5" />
+
         </LynxModule>
         <LynxModule name="Servo Hub" port="3">
             <Servo name="turret1" port="0" />
@@ -18,6 +19,7 @@
             <goBILDA5202SeriesMotor name="driveBackLeft" port="2" />
             <goBILDA5202SeriesMotor name="driveBackRight" port="3" />
             <LynxEmbeddedIMU name="imu" port="0" bus="0" />
+            <goBILDAPinpoint name="pinpoint" port="0" bus="1"/>
         </LynxModule>
     </LynxUsbDevice>
 </Robot>

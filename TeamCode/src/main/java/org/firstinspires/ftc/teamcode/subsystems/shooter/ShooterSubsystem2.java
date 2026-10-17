@@ -32,7 +32,7 @@ public class ShooterSubsystem2 {
     }
 
     public void setPower(double power){
-        shooterMotorRight.setPower(power);
+        shooterMotorRight.setPower(-power);
         shooterMotorLeft.setPower(-power);
 
     }

@@ -39,7 +39,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public void setPower(double power) {
         intakeMotor.setPower(power);
-        Logger.writer.write("Intake/IntakeThrottle", power);
+        //Logger.writer.write("Intake/IntakeThrottle", power);
     }
     public void setPivot(PivotState state) {
         this.pivotState = state;
@@ -48,7 +48,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void on() {
-        setPower(0.7);
+        setPower(0.6);
     }
     public void off() {
         setPower(0.0);

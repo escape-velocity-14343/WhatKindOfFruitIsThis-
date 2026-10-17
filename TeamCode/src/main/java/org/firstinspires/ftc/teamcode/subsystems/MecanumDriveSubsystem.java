@@ -67,6 +67,32 @@ public class MecanumDriveSubsystem extends SubsystemBase {
         frontRightMotor.setPower(frontRightPower);
         backRightMotor.setPower(backRightPower);
     }
+    public void driveFC(double x, double y, double turn, double botHeading) {
+
+        if (Math.abs(botHeading)> 7) {
+            Log.e("MecanumDriveSubsystem", "IMU Heading is out of range: " + botHeading);
+        }
+
+        // Rotate the movement direction counter to the bot's rotation
+        double rotX = -y * Math.cos(-botHeading) - x * Math.sin(-botHeading);
+        double rotY = -y * Math.sin(-botHeading) + x * Math.cos(-botHeading);
+
+        rotX = rotX * 1.1;  // Counteract imperfect strafing
+
+        // Denominator is the largest motor power (absolute value) or 1
+        // This ensures all the powers maintain the same ratio,
+        // but only if at least one is out of the range [-1, 1]
+        double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(turn), 1);
+        double frontLeftPower = (rotY + rotX + turn) / denominator;
+        double backLeftPower = (rotY - rotX + turn) / denominator;
+        double frontRightPower = (rotY - rotX - turn) / denominator;
+        double backRightPower = (rotY + rotX - turn) / denominator;
+
+        frontLeftMotor.setPower(frontLeftPower);
+        backLeftMotor.setPower(backLeftPower);
+        frontRightMotor.setPower(frontRightPower);
+        backRightMotor.setPower(backRightPower);
+    }
     public void setHeadingSupplier(DoubleSupplier headingSupplier){
         heading = headingSupplier;
     }
