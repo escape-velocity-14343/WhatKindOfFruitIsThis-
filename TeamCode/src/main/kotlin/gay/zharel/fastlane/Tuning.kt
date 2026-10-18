@@ -4,6 +4,8 @@ import com.acmerobotics.dashboard.config.Config
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import dev.nextftc.control.geometry.Vector2d
 import gay.zharel.fateweaver.flight.FateLogManager
+import gay.zharel.fateweaver.telemetry.Fate
+import gay.zharel.fateweaver.telemetry.log
 import java.util.function.Consumer
 
 enum class Axis {
@@ -50,7 +52,7 @@ abstract class StoppingDistanceTuner : LinearOpMode() {
 
         val backwards = PoseVoltage2d(forwards.linearVolt * -1.0, forwards.angVolt)
 
-        val writer = FateLogManager.start("StoppingDistanceTest${axis.name}-${System.nanoTime()}")
+//        val writer = FateLogManager.start("StoppingDistanceTest${axis.name}-${System.nanoTime()}")
         val localizer = TuningMechanisms.localizer
 
         // run 5 data points worth of tests
@@ -59,10 +61,10 @@ abstract class StoppingDistanceTuner : LinearOpMode() {
         for (timing in timings) {
             for (trial in 1..3) {
                 val testName = "Test-${timing}-${trial}"
-                writer.write(testName, "Test Start. System time: ${System.nanoTime()}")
+                Fate.log(testName, "Test Start. System time: ${System.nanoTime()}")
 
                 var startTime = System.nanoTime()
-                writer.write(testName, "Forward Pass Start. System time: ${System.nanoTime()}")
+                Fate.log(testName, "Forward Pass Start. System time: ${System.nanoTime()}")
 
                 TuningMechanisms.driveFunction.accept(forwards)
 
@@ -70,20 +72,20 @@ abstract class StoppingDistanceTuner : LinearOpMode() {
                     localizer.update()
                 }
 
-                writer.write(testName, "Forward Pass End. System time: ${System.nanoTime()}")
+                Fate.log(testName, "Forward Pass End. System time: ${System.nanoTime()}")
                 var endPose = localizer.getPose()
-                writer.write("endVelocity", localizer.getVelocity().linearVel.norm())
+                Fate.log("endVelocity", localizer.getVelocity().linearVel.norm())
 
                 while (localizer.getVelocity().linearVel.norm() > 0.01) {
                     localizer.update()
                 }
 
-                writer.write(testName, "Forward Coast End. System time: ${System.nanoTime()}")
+                Fate.log(testName, "Forward Coast End. System time: ${System.nanoTime()}")
                 var coastPose = localizer.getPose()
-                writer.write("endDistance", coastPose.distanceTo(endPose))
+                Fate.log("endDistance", coastPose.distanceTo(endPose))
 
                 startTime = System.nanoTime()
-                writer.write(testName, "Backward Pass Start. System time: ${System.nanoTime()}")
+                Fate.log(testName, "Backward Pass Start. System time: ${System.nanoTime()}")
 
                 TuningMechanisms.driveFunction.accept(backwards)
 
@@ -91,17 +93,17 @@ abstract class StoppingDistanceTuner : LinearOpMode() {
                     localizer.update()
                 }
 
-                writer.write(testName, "Backward Pass End. System time: ${System.nanoTime()}")
+                Fate.log(testName, "Backward Pass End. System time: ${System.nanoTime()}")
                 endPose = localizer.getPose()
-                writer.write("endVelocity", localizer.getVelocity().linearVel.norm())
+                Fate.log("endVelocity", localizer.getVelocity().linearVel.norm())
 
                 while (localizer.getVelocity().linearVel.norm() > 0.01) {
                     localizer.update()
                 }
 
-                writer.write(testName, "Backward Coast End. System time: ${System.nanoTime()}")
+                Fate.log(testName, "Backward Coast End. System time: ${System.nanoTime()}")
                 coastPose = localizer.getPose()
-                writer.write("endDistance", coastPose.distanceTo(endPose))
+                Fate.log("endDistance", coastPose.distanceTo(endPose))
             }
         }
     }

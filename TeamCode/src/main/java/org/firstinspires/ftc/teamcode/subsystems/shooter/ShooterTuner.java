@@ -7,7 +7,6 @@ import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Utility;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import gay.zharel.fateweaver.flight.FlightRecorder;
 import org.firstinspires.ftc.teamcode.subsystems.TransferSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.Turret.TurretSubsystem;
@@ -15,7 +14,6 @@ import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.CounterrollerSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.FlywheelBaseSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.FlywheelSubsystem;
-import org.firstinspires.ftc.teamcode.util.Logger;
 
 import java.util.List;
 import java.util.Objects;
@@ -45,7 +43,6 @@ public class ShooterTuner extends LinearOpMode {
         }
 
         telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), telemetry);
-        Logger.start(this);
 
         ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap);
         TurretSubsystem turret = new TurretSubsystem(hardwareMap);

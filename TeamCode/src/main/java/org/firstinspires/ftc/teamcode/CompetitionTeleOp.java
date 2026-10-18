@@ -13,7 +13,6 @@ import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.TransferSubsystem;
 //import org.firstinspires.ftc.teamcode.subsystems.shooter.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.ShooterSubsystem2;
-import org.firstinspires.ftc.teamcode.util.Logger;
 
 @TeleOp(name = "TeleOp")
 public class CompetitionTeleOp extends LinearOpMode {
@@ -22,7 +21,6 @@ public class CompetitionTeleOp extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), telemetry);
-        Logger.start(this);
 
         IntakeSubsystem intake = new IntakeSubsystem(hardwareMap);
         TransferSubsystem transfer = new TransferSubsystem(hardwareMap);

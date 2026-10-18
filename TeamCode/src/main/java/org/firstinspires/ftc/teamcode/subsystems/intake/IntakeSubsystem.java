@@ -6,7 +6,7 @@ import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.*;
-import org.firstinspires.ftc.teamcode.util.Logger;
+import gay.zharel.fateweaver.telemetry.Fate;
 
 @Config
 public class IntakeSubsystem extends SubsystemBase {
@@ -33,18 +33,18 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public void periodic() {
         // this is usually cached so its prob fine
-        Logger.writer.write("Intake/IntakeThrottle", intakeMotor.getPower());
-        Logger.writer.write("Intake/Pivot", pivotState);
+        Fate.log("Intake/IntakeThrottle", intakeMotor.getPower());
+        Fate.log("Intake/Pivot", pivotState);
     }
 
     public void setPower(double power) {
         intakeMotor.setPower(power);
-        Logger.writer.write("Intake/IntakeThrottle", power);
+        Fate.log("Intake/IntakeThrottle", power);
     }
     public void setPivot(PivotState state) {
         this.pivotState = state;
         // intakePivot.setPosition(state.pos);
-        Logger.writer.write("Intake/Pivot", state);
+        Fate.log("Intake/Pivot", state);
     }
 
     public void on() {
