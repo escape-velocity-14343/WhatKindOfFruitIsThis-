@@ -1,7 +1,6 @@
-package org.firstinspires.ftc.teamcode.subsystems.Turret;
+package org.firstinspires.ftc.teamcode.subsystems.turret;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.arcrobotics.ftclib.hardware.ServoEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;

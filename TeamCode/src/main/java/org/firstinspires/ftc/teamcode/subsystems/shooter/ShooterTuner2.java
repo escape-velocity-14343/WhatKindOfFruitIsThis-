@@ -6,7 +6,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.subsystems.TransferSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.Turret.TurretSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.turret.TurretSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.util.Logger;
 
@@ -27,7 +27,6 @@ public class ShooterTuner2 extends LinearOpMode {
         waitForStart();
         intake.on();
         transfer.intake();
-        Logger.start(this);
         while (opModeIsActive()){
             shooter.flywheel.setTargetVelocity(RotationsPerMinute.of(desired_Velocity));
             shooter.rollers.setPower(1);
