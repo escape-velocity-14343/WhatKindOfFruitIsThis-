@@ -4,7 +4,6 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import gay.zharel.fateweaver.flight.FlightRecorder;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 

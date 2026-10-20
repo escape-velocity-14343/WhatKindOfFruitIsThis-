@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.subsystems.TransferSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.turret.TurretSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.util.Logger;
 
 @TeleOp
 @Config
@@ -23,7 +22,6 @@ public class ShooterTuner2 extends LinearOpMode {
 
         IntakeSubsystem intake = new IntakeSubsystem(hardwareMap);
         TransferSubsystem transfer = new TransferSubsystem(hardwareMap);
-        TurretSubsystem turret = new TurretSubsystem(hardwareMap);
         waitForStart();
         intake.on();
         transfer.intake();
@@ -31,7 +29,7 @@ public class ShooterTuner2 extends LinearOpMode {
             shooter.flywheel.setTargetVelocity(RotationsPerMinute.of(desired_Velocity));
             shooter.rollers.setPower(1);
             shooter.flywheel.periodic();
-            turret.setDegrees(turretPos);
+            shooter.turret.setDegrees(turretPos);
             telemetry.addData("Desired Velocity", rollerVelocity);
             telemetry.update();
         }

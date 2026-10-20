@@ -7,10 +7,11 @@ import dev.nextftc.units.measuretypes.AngularVelocity;
 import gay.zharel.fateweaver.schemas.CustomStructSchema;
 import gay.zharel.fateweaver.schemas.DoubleSchema;
 import gay.zharel.fateweaver.schemas.EnumSchema;
+import gay.zharel.fateweaver.telemetry.Fate;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.CounterrollerSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.FlywheelSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.hood.HoodSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.shooter.hood.RailSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.shooter.rail.RailSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.turret.TurretSubsystem;
 
 import java.util.Arrays;
@@ -45,7 +46,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     // converts the shooter state to a loggable thing
-    public static CustomStructSchema<ShooterState> shooterStateSchema = new CustomStructSchema<ShooterState>(
+    public static final CustomStructSchema<ShooterState> shooterStateSchema = new CustomStructSchema<>(
             "ShooterState",
             Arrays.asList("flywheelRpm", "rollerRpm", "hoodDegrees", "turretDegrees", "shooterElement"),
             Arrays.asList(DoubleSchema.INSTANCE,
@@ -64,12 +65,39 @@ public class ShooterSubsystem extends SubsystemBase {
     public HoodSubsystem hood;
     public RailSubsystem rail;
     public TurretSubsystem turret;
+    public ShooterState state = new ShooterState(
+            RotationsPerMinute.of(0.0),
+            RotationsPerMinute.of(0.0),
+            Degrees.of(HoodSubsystem.hoodMinDegrees),
+            Degrees.of(0.0),
+            ShooterElement.POLLEN
+    );
     public ShooterSubsystem(HardwareMap hardwareMap) {
         this.rollers = new CounterrollerSubsystem(hardwareMap);
         this.flywheel = new FlywheelSubsystem(hardwareMap);
         this.hood = new HoodSubsystem(hardwareMap);
         this.rail = new RailSubsystem(hardwareMap);
         this.turret = new TurretSubsystem(hardwareMap);
+    }
+
+    /**
+     * implement when we start actually aiming! sets all the targets that we want
+     */
+    public void update() {
+        this.rollers.setTargetVelocity(state.rollerAngVel);
+        this.flywheel.setTargetVelocity(state.flywheelAngVel);
+        this.hood.setAngle(state.hoodAngle);
+        this.turret.setDegrees(state.turretAngle.into(Degrees));
+        this.rail.set(state.element);
+
+        Fate.log("Shooter/TargetState", state, shooterStateSchema);
+        Fate.log("Shooter/CurrentState", new ShooterState(
+                rollers.getCurrentVelocity(),
+                flywheel.getCurrentVelocity(),
+                state.hoodAngle,
+                state.turretAngle,
+                state.element
+        ), shooterStateSchema);
     }
 
 }

@@ -49,8 +49,6 @@ public class CompetitionTeleOp extends LinearOpMode {
         IMU imu = hardwareMap.get(IMU.class, "imu");
         imu.initialize(params);
 
-        TurretSubsystem turret = new TurretSubsystem(hardwareMap);
-
 
         boolean lastA = false;
         CommandScheduler.getInstance().cancelAll();
@@ -64,7 +62,7 @@ public class CompetitionTeleOp extends LinearOpMode {
             }
             //CommandScheduler.
             //CommandScheduler.getInstance().run();
-            turret.setDegrees(turretAngle);
+            shooter.turret.setDegrees(turretAngle);
             telemetry.addData("Turret Angle", turretAngle);
             telemetry.addData("Shooter RPM", shooter.flywheel.getCurrentVelocity()
                     .into(RotationsPerMinute));

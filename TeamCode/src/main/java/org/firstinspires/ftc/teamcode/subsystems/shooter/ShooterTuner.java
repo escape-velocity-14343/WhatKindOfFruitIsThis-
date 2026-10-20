@@ -46,7 +46,6 @@ public class ShooterTuner extends LinearOpMode {
         telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), telemetry);
 
         ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap);
-        TurretSubsystem turret = new TurretSubsystem(hardwareMap);
 
         if (enableIntakeTransfer) {
             intake = new IntakeSubsystem(hardwareMap);
@@ -83,7 +82,8 @@ public class ShooterTuner extends LinearOpMode {
             }
 
             shooter.hood.setAngle(Degrees.of(hoodDegrees));
-            turret.setDegrees(0);
+            shooter.turret.setDegrees(turretDegrees);
+            shooter.rail.set(element);
 
             telemetry.addData("Flywheel RPM", shooter.flywheel.getCurrentVelocity().into(RotationsPerMinute));
             telemetry.addData("Target Flywheel RPM", flywheelPowerOrRpm);
