@@ -127,6 +127,9 @@ public class CompetitionTeleOp extends LinearOpMode {
             telemetry.addData("current loop ms", loopTime.milliseconds());
             telemetry.addData("running average ms", ((double)System.currentTimeMillis() - initialTime) / ((double) loops));
             telemetry.update();
+
+            loopTime.reset();
+
             shooter.flywheel.periodic();
             shooter.rollers.periodic();
 
