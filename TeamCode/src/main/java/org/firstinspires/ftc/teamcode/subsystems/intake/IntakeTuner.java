@@ -6,7 +6,6 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Utility;
-import org.firstinspires.ftc.teamcode.util.Logger;
 
 @Utility
 @Config
@@ -18,7 +17,6 @@ public class IntakeTuner extends LinearOpMode {
     @Override
     public void runOpMode() {
         telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), telemetry);
-        Logger.start(this);
 
         IntakeSubsystem intake = new IntakeSubsystem(hardwareMap);
 

@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import dev.nextftc.units.Measure;
 import dev.nextftc.units.measuretypes.Angle;
 import dev.nextftc.units.unittypes.AngleUnit;
-import org.firstinspires.ftc.teamcode.util.Logger;
+import gay.zharel.fateweaver.telemetry.Fate;
 
 import static dev.nextftc.units.Units.Degrees;
 
@@ -41,8 +41,8 @@ public class HoodSubsystem extends SubsystemBase {
 
         this.angle = angle;
 
-        Logger.writer.write("Shooter/Hood/Degrees", angle.into(Degrees));
-        Logger.writer.write("Shooter/Hood/ServoValue", hoodServo.getPosition());
+        Fate.log("Shooter/Hood/Degrees", angle.into(Degrees));
+        Fate.log("Shooter/Hood/ServoValue", hoodServo.getPosition());
     }
 
     private double getServoValueFromAngle(Angle angle) {
@@ -56,8 +56,8 @@ public class HoodSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        Logger.writer.write("Shooter/Hood/Degrees", angle.into(Degrees));
-        Logger.writer.write("Shooter/Hood/ServoValue", hoodServo.getPosition());
+        Fate.log("Shooter/Hood/Degrees", angle.into(Degrees));
+        Fate.log("Shooter/Hood/ServoValue", hoodServo.getPosition());
     }
 
 }

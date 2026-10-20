@@ -22,7 +22,6 @@ import org.firstinspires.ftc.teamcode.subsystems.TransferSubsystem;
 //import org.firstinspires.ftc.teamcode.subsystems.shooter.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.ShooterSubsystem2;
-import org.firstinspires.ftc.teamcode.util.Logger;
 
 import java.util.List;
 
@@ -34,7 +33,6 @@ public class CompetitionTeleOp extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), telemetry);
-        Logger.start(this);
 
         List<LynxModule> hubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : hubs) {

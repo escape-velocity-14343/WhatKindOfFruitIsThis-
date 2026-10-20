@@ -1,18 +1,13 @@
 package org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.SimpleMotorFeedforward;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import dev.nextftc.units.measuretypes.AngularVelocity;
-import gay.zharel.fastlane.VoltageCache;
-import org.firstinspires.ftc.teamcode.util.Logger;
+import gay.zharel.fateweaver.telemetry.Fate;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static dev.nextftc.units.Units.*;
@@ -81,8 +76,8 @@ public class FlywheelBaseSubsystem extends SubsystemBase {
                 break;
         }
 
-        Logger.writer.write("Shooter/" + config.name + "/currentRPM", currentVelocity.into(RotationsPerMinute));
-        Logger.writer.write("Shooter/" + config.name + "/targetRPM", targetVelocity.into(RotationsPerMinute));
+        Fate.log("Shooter/" + config.name + "/currentRPM", currentVelocity.into(RotationsPerMinute));
+        Fate.log("Shooter/" + config.name + "/targetRPM", targetVelocity.into(RotationsPerMinute));
     }
 
     public void setTargetVelocity(AngularVelocity targetVelocity) {

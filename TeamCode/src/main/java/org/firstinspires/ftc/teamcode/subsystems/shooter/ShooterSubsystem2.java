@@ -1,24 +1,12 @@
 package org.firstinspires.ftc.teamcode.subsystems.shooter;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.arcrobotics.ftclib.controller.PIDController;
-import com.arcrobotics.ftclib.controller.wpilibcontroller.SimpleMotorFeedforward;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import dev.nextftc.units.measuretypes.AngularVelocity;
-import gay.zharel.fastlane.VoltageCache;
 import gay.zharel.fateweaver.flight.FlightRecorder;
-import gay.zharel.fateweaver.log.FateLogWriter;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.teamcode.util.Logger;
-
-import static dev.nextftc.units.Units.*;
-import static gay.zharel.fastlane.UnitsKt.AppliedThrottle;
-import static gay.zharel.fastlane.UnitsKt.Throttle;
 
 @Config
 public class ShooterSubsystem2 {
