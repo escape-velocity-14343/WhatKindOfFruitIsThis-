@@ -12,10 +12,9 @@ import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.CounterrollerS
 import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.FlywheelSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.hood.HoodSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.rail.RailSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.turret.TurretSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.shooter.turret.TurretSubsystem;
 
 import java.util.Arrays;
-import java.util.List;
 
 import static dev.nextftc.units.Units.*;
 
