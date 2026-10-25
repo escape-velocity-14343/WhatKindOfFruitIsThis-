@@ -1,6 +1,10 @@
 package org.firstinspires.ftc.teamcode.subsystems.shooter;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.arcrobotics.ftclib.geometry.Pose2d;
+import com.arcrobotics.ftclib.geometry.Rotation2d;
+import com.arcrobotics.ftclib.geometry.Transform2d;
+import com.arcrobotics.ftclib.geometry.Translation2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import dev.nextftc.units.measuretypes.Angle;
 import dev.nextftc.units.measuretypes.AngularVelocity;
@@ -8,6 +12,7 @@ import gay.zharel.fateweaver.schemas.CustomStructSchema;
 import gay.zharel.fateweaver.schemas.DoubleSchema;
 import gay.zharel.fateweaver.schemas.EnumSchema;
 import gay.zharel.fateweaver.telemetry.Fate;
+import org.firstinspires.ftc.teamcode.subsystems.PositionConstants;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.CounterrollerSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.FlywheelSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.hood.HoodSubsystem;
@@ -82,10 +87,12 @@ public class ShooterSubsystem extends SubsystemBase {
     /**
      * implement when we start actually aiming! sets all the targets that we want
      */
-    public void update() {
-        this.rollers.setTargetVelocity(state.rollerAngVel);
-        this.flywheel.setTargetVelocity(state.flywheelAngVel);
-        this.hood.setAngle(state.hoodAngle);
+    public void update(Pose2d robotPose) {
+        this.state = calculateTargetShooterState(robotPose);
+
+//        this.rollers.setTargetVelocity(state.rollerAngVel);
+//        this.flywheel.setTargetVelocity(state.flywheelAngVel);
+//        this.hood.setAngle(state.hoodAngle);
         this.turret.setDegrees(state.turretAngle.into(Degrees));
         //this.rail.set(state.element);
 
@@ -97,6 +104,27 @@ public class ShooterSubsystem extends SubsystemBase {
                 state.turretAngle,
                 state.element
         ), shooterStateSchema);
+    }
+
+    public ShooterState calculateTargetShooterState(Pose2d robotPose) {
+
+        Pose2d goalPose = PositionConstants.getGoalPose();
+
+        // this will auto-rotate the turret offset to be correct
+        Pose2d turretPose = robotPose.plus(new Transform2d(PositionConstants.TURRET_OFFSET, new Rotation2d()));
+
+        Translation2d differenceBetweenPoses = goalPose.getTranslation().minus(turretPose.getTranslation());
+        // find angle: atan2 + subtract robot heading
+        Angle turretAngle = Radians.of(Math.atan2(differenceBetweenPoses.getY(), differenceBetweenPoses.getX()))
+                .plus(Radians.of(-robotPose.getRotation().getRadians())).times(-1);
+
+        return new ShooterState(
+                RotationsPerMinute.of(0.0),
+                RotationsPerMinute.of(0.0),
+                Degrees.of(0.0),
+                turretAngle,
+                ShooterElement.POLLEN
+        );
     }
 
 }

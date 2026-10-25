@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.subsystems.pinpoint;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.INCH;
 
@@ -26,8 +26,8 @@ public class PinpointSubsystem extends SubsystemBase {
 
     public static boolean flipX = false;
     public static boolean flipY = true;
-    public static double xEncOffset = 1.5;
-    public static double yEncOffset = -4;
+    public static double xEncOffset = 2.8;
+    public static double yEncOffset = -3.8;
 
     private Pose2D lastGoodPose = new Pose2D(INCH, 0, 0, AngleUnit.DEGREES, 0);
     double turretOffsetX = -81 / 25.4;
