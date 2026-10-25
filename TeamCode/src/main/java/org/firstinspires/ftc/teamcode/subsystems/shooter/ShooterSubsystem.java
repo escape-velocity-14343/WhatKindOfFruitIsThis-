@@ -12,6 +12,7 @@ import gay.zharel.fateweaver.schemas.CustomStructSchema;
 import gay.zharel.fateweaver.schemas.DoubleSchema;
 import gay.zharel.fateweaver.schemas.EnumSchema;
 import gay.zharel.fateweaver.telemetry.Fate;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.subsystems.PositionConstants;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.CounterrollerSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.FlywheelSubsystem;
@@ -115,8 +116,11 @@ public class ShooterSubsystem extends SubsystemBase {
 
         Translation2d differenceBetweenPoses = goalPose.getTranslation().minus(turretPose.getTranslation());
         // find angle: atan2 + subtract robot heading
-        Angle turretAngle = Radians.of(Math.atan2(differenceBetweenPoses.getY(), differenceBetweenPoses.getX()))
-                .plus(Radians.of(-robotPose.getRotation().getRadians())).times(-1);
+        Angle turretAngle = Radians.of(
+                AngleUnit.normalizeRadians(
+                        Math.atan2(differenceBetweenPoses.getY(), differenceBetweenPoses.getX())
+                        -robotPose.getRotation().getRadians()))
+                .times(-1);
 
         return new ShooterState(
                 RotationsPerMinute.of(0.0),
