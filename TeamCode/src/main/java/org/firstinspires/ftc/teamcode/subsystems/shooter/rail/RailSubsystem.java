@@ -27,6 +27,11 @@ public class RailSubsystem extends SubsystemBase {
     /**
      * warning: will make the element logging invalid
      */
+
+    public void position(double pos){
+        railServo.setPosition(pos);
+    }
+
     public void setServo(double pos) {
         this.railServo.setPosition(pos);
     }

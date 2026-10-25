@@ -20,13 +20,15 @@ import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.TransferSubsystem;
 //import org.firstinspires.ftc.teamcode.subsystems.shooter.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.ShooterSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.shooter.hood.HoodSubsystem2;
+import org.firstinspires.ftc.teamcode.subsystems.shooter.rail.RailSubsystem2;
 
 import java.util.List;
 
 @TeleOp(name = "TeleOp")
 public class CompetitionTeleOp extends LinearOpMode {
     int turretAngle = -5;
-    int shooterVelocity = 5000;
+    int shooterVelocity = -5000;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -36,7 +38,8 @@ public class CompetitionTeleOp extends LinearOpMode {
         for (LynxModule hub : hubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
-
+        HoodSubsystem2 hood = new HoodSubsystem2(hardwareMap);
+        RailSubsystem2 rail = new RailSubsystem2(hardwareMap);
         IntakeSubsystem intake = new IntakeSubsystem(hardwareMap);
         TransferSubsystem transfer = new TransferSubsystem(hardwareMap);
         ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap);
@@ -48,7 +51,7 @@ public class CompetitionTeleOp extends LinearOpMode {
         IMU imu = hardwareMap.get(IMU.class, "imu");
         imu.initialize(params);
 
-
+        rail.pollen();
         boolean lastA = false;
         CommandScheduler.getInstance().cancelAll();
         waitForStart();
@@ -66,8 +69,20 @@ public class CompetitionTeleOp extends LinearOpMode {
             telemetry.addData("Shooter RPM", shooter.flywheel.getCurrentVelocity()
                     .into(RotationsPerMinute));
             telemetry.addData("Shooter Target RPM", shooterVelocity);
-            //pinpoint.update();
-            drive.driveFC(-gamepad1.left_stick_y, -gamepad1.left_stick_x, gamepad1.right_stick_x, imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
+            pinpoint.periodic();
+            drive.driveFC(-gamepad1.left_stick_y, -gamepad1.left_stick_x, gamepad1.right_stick_x, pinpoint.getHeading().getRadians());
+            if (gamepad1.x){
+                hood.max();
+            }
+            if(gamepad1.y){hood.min();}
+
+            if (gamepad1.a){
+                rail.pollen();
+            }
+
+            if (gamepad1.b){
+                rail.nectar();
+            }
 
             if (gamepad1.left_bumper) {
                 intake.setPower(-0.5);
@@ -104,12 +119,12 @@ public class CompetitionTeleOp extends LinearOpMode {
             //} else
 
             if (gamepad1.dpadUpWasReleased()){
-                shooterVelocity += 100;
+                shooterVelocity -= 100;
                 if (shooterVelocity > 6000){
                     shooterVelocity = 6000;
                 }
             } else if (gamepad1.dpadDownWasReleased()) {
-                shooterVelocity -= 100;
+                shooterVelocity += 100;
             }
 
             if (gamepad1.right_bumper) {
@@ -122,6 +137,8 @@ public class CompetitionTeleOp extends LinearOpMode {
 
             //lastA = gamepad1.a;
             telemetry.addData("pinpoint heading", pinpoint.getHeading().getDegrees());
+            telemetry.addData("pinpointX", pinpoint.getPose().getX());
+            telemetry.addData("pinpointY", pinpoint.getPose().getY());
             //telemetry.addData("shooter velocity", shooter.flywheel.getCurrentVelocity().into(RotationsPerMinute));
             loops++;
             telemetry.addData("current loop ms", loopTime.milliseconds());

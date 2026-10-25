@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 @Config
 public class TransferSubsystem extends SubsystemBase {
 
-    public static double transferIntakeSpeed = 0.5;
+    public static double transferIntakeSpeed = 1;
     public static double transferTransferSpeed = 1;
     public static double transferRejectSpeed = -0.3;
     DcMotor transferMotor;

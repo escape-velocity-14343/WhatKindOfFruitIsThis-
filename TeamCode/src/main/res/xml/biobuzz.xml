@@ -12,6 +12,9 @@
         <LynxModule name="Servo Hub" port="3">
             <Servo name="turret1" port="0" />
             <Servo name="turret2" port="5" />
+            <Servo name="hood" port="1" />
+            <Servo name="railServo" port="2" />
+
         </LynxModule>
         <LynxModule name="Control Hub" port="173">
             <goBILDA5202SeriesMotor name="driveFrontLeft" port="0" />

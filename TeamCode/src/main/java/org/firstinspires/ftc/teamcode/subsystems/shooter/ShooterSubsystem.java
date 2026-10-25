@@ -11,7 +11,7 @@ import gay.zharel.fateweaver.telemetry.Fate;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.CounterrollerSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.FlywheelSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.hood.HoodSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.shooter.rail.RailSubsystem;
+//import org.firstinspires.ftc.teamcode.subsystems.shooter.rail.RailSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.turret.TurretSubsystem;
 
 import java.util.Arrays;
@@ -62,7 +62,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public FlywheelSubsystem flywheel;
     public CounterrollerSubsystem rollers;
     public HoodSubsystem hood;
-    public RailSubsystem rail;
+    //public RailSubsystem rail;
     public TurretSubsystem turret;
     public ShooterState state = new ShooterState(
             RotationsPerMinute.of(0.0),
@@ -75,7 +75,7 @@ public class ShooterSubsystem extends SubsystemBase {
         this.rollers = new CounterrollerSubsystem(hardwareMap);
         this.flywheel = new FlywheelSubsystem(hardwareMap);
         this.hood = new HoodSubsystem(hardwareMap);
-        this.rail = new RailSubsystem(hardwareMap);
+        //this.rail = new RailSubsystem(hardwareMap);
         this.turret = new TurretSubsystem(hardwareMap);
     }
 
@@ -87,7 +87,7 @@ public class ShooterSubsystem extends SubsystemBase {
         this.flywheel.setTargetVelocity(state.flywheelAngVel);
         this.hood.setAngle(state.hoodAngle);
         this.turret.setDegrees(state.turretAngle.into(Degrees));
-        this.rail.set(state.element);
+        //this.rail.set(state.element);
 
         Fate.log("Shooter/TargetState", state, shooterStateSchema);
         Fate.log("Shooter/CurrentState", new ShooterState(

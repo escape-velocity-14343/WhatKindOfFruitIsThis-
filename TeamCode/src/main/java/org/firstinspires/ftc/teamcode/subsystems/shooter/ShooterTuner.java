@@ -82,7 +82,7 @@ public class ShooterTuner extends LinearOpMode {
 
             shooter.hood.setAngle(Degrees.of(hoodDegrees));
             shooter.turret.setDegrees(turretDegrees);
-            shooter.rail.set(element);
+            //shooter.rail.set(element);
 
             telemetry.addData("Flywheel RPM", shooter.flywheel.getCurrentVelocity().into(RotationsPerMinute));
             telemetry.addData("Target Flywheel RPM", flywheelPowerOrRpm);
