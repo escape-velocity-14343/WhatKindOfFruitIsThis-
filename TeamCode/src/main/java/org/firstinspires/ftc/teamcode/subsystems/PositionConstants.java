@@ -11,11 +11,12 @@ import com.arcrobotics.ftclib.geometry.Translation2d;
  */
 @Config
 public class PositionConstants {
-
-    public static Pose2d LEFT_GOAL_POSE = new Pose2d(-12.75, 18.5820411442, new Rotation2d());
+    public static double goalX = -16.2;  // -12.75
+    public static double goalY = 18.5820411442;
+    public static Pose2d LEFT_GOAL_POSE = new Pose2d(goalX, goalY, new Rotation2d());
     public static Pose2d RIGHT_GOAL_POSE = new Pose2d(LEFT_GOAL_POSE.getX(), -LEFT_GOAL_POSE.getY(), LEFT_GOAL_POSE.getRotation());
 
-    public static boolean rightGoalIsUp = true;
+    public static boolean rightGoalIsUp = false;
 
     public static Pose2d getGoalPose() {
         return rightGoalIsUp ? RIGHT_GOAL_POSE : LEFT_GOAL_POSE;
