@@ -26,6 +26,8 @@ import org.firstinspires.ftc.teamcode.subsystems.shooter.turret.TurretSubsystem;
 import java.util.Arrays;
 
 import static dev.nextftc.units.Units.*;
+import static gay.zharel.fastlane.UnitsKt.AppliedThrottle;
+import static gay.zharel.fastlane.UnitsKt.Throttle;
 
 // ok hello basically this one does all the aiming calculations and the other
 // smaller ones do all the everything else ok thank you bye
@@ -111,11 +113,13 @@ public class ShooterSubsystem extends SubsystemBase {
 //        this.hood.setAngle(state.hoodAngle);
         this.turret.setDegrees(state.turretAngle.into(Degrees));
         //this.rail.set(state.element);
-        flywheel.setTargetVelocity(RotationsPerMinute.of(pollenVelocity.get(Range.clip(robotPose.getTranslation().getDistance(PositionConstants.getGoalPose().getTranslation()),35.1, 87.9))));
+        flywheel.setTargetVelocity(state.flywheelAngVel);
+        rollers.setPower(Throttle.of(1).into(AppliedThrottle));
+
         Fate.log("Shooter/TargetState", state, shooterStateSchema);
         Fate.log("Shooter/CurrentState", new ShooterState(
-                rollers.getCurrentVelocity(),
                 flywheel.getCurrentVelocity(),
+                rollers.getCurrentVelocity(),
                 state.hoodAngle,
                 state.turretAngle,
                 state.element
@@ -137,8 +141,10 @@ public class ShooterSubsystem extends SubsystemBase {
                         -robotPose.getRotation().getRadians()))
                 .times(-1);
 
+        AngularVelocity flywheelVelocity = RotationsPerMinute.of(pollenVelocity.get(Range.clip(robotPose.getTranslation().getDistance(PositionConstants.getGoalPose().getTranslation()),35.1, 87.9)));
+
         return new ShooterState(
-                RotationsPerMinute.of(0.0),
+                flywheelVelocity,
                 RotationsPerMinute.of(0.0),
                 Degrees.of(0.0),
                 turretAngle,

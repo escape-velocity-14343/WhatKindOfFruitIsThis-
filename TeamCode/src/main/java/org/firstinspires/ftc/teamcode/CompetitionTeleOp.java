@@ -135,7 +135,7 @@ public class CompetitionTeleOp extends LinearOpMode {
 //                shooter.rollers.setPower(0);
 //            }
 //            shooter.flywheel.setTargetVelocity(RotationsPerMinute.of(shooterVelocity));
-            shooter.rollers.setPower(Throttle.of(1).into(AppliedThrottle));
+//            shooter.rollers.setPower(Throttle.of(1).into(AppliedThrottle));
 
             double distanceToGoal = pinpoint.getPose().getTranslation().getDistance(PositionConstants.getGoalPose().getTranslation());
 

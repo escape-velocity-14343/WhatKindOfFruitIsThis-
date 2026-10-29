@@ -6,6 +6,11 @@ import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.arcrobotics.ftclib.geometry.Transform2d;
 import com.arcrobotics.ftclib.geometry.Translation2d;
 
+import java.util.Arrays;
+
+import gay.zharel.fateweaver.schemas.CustomStructSchema;
+import gay.zharel.fateweaver.schemas.DoubleSchema;
+
 /**
  * COORDINATE SYSTEM: FROM DRIVER POV, +X IS FORWARD, +Y IS LEFT
  */
@@ -16,7 +21,7 @@ public class PositionConstants {
     public static Pose2d LEFT_GOAL_POSE = new Pose2d(goalX, goalY, new Rotation2d());
     public static Pose2d RIGHT_GOAL_POSE = new Pose2d(LEFT_GOAL_POSE.getX(), -LEFT_GOAL_POSE.getY(), LEFT_GOAL_POSE.getRotation());
 
-    public static boolean rightGoalIsUp = false;
+    public static boolean rightGoalIsUp = true;
 
     public static Pose2d getGoalPose() {
         return rightGoalIsUp ? RIGHT_GOAL_POSE : LEFT_GOAL_POSE;
@@ -26,5 +31,11 @@ public class PositionConstants {
      * relative to robot
      */
     public static Translation2d TURRET_OFFSET = new Translation2d(-1, 0);
+
+    public static CustomStructSchema<Pose2d> poseSchema = new CustomStructSchema<Pose2d>(
+            "Pose2d",
+            Arrays.asList("x", "y", "heading"),
+            Arrays.asList(DoubleSchema.INSTANCE, DoubleSchema.INSTANCE, DoubleSchema.INSTANCE),
+            (Pose2d pose) -> Arrays.asList(pose.getX(), pose.getY(), pose.getRotation().getRadians()));
 
 }

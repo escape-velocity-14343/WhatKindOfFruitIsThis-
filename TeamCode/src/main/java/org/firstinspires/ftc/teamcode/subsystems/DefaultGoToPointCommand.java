@@ -1,7 +1,11 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static gay.zharel.fastlane.UnitsKt.AppliedThrottle;
+import static gay.zharel.fastlane.UnitsKt.Throttle;
+
 import android.util.Log;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.geometry.Pose2d;
@@ -21,7 +25,9 @@ import org.firstinspires.ftc.teamcode.subsystems.pinpoint.PinpointSubsystem;
 
 import java.util.function.DoubleSupplier;
 
-//@Configurable
+import gay.zharel.fateweaver.telemetry.Fate;
+
+@Config
 public class DefaultGoToPointCommand extends CommandBase {
     public PIDController xPID = new PIDController(0,0,0);
     public PIDController yPID = new PIDController(0, 0,0);
@@ -29,10 +35,10 @@ public class DefaultGoToPointCommand extends CommandBase {
 
     public DrivetrainSquIDController drivetrainSquIDController = new DrivetrainSquIDController();
 
-    public static double translationkP = -0.085;
+    public static double translationkP = 0.04;
     public static double translationkI = 0;
     public static double translationkD = 0;
-    public static double headingkP = 0.06;
+    public static double headingkP = 0.075;
     public static double headingkI = 0;
     public static double headingkD = 0;
 
@@ -42,8 +48,8 @@ public class DefaultGoToPointCommand extends CommandBase {
     org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem drive;
     org.firstinspires.ftc.teamcode.subsystems.pinpoint.PinpointSubsystem pinpoint;
 
-    public static boolean useVelCompensated = true;
-    public static boolean usePID = false;
+    public static boolean useVelCompensated = false;
+    public static boolean usePID = true;
 
     private boolean toggle = true;
 
@@ -148,6 +154,9 @@ public class DefaultGoToPointCommand extends CommandBase {
         }
         double hMove = -rotSpeedSupplier.getAsDouble();
 
+        drive.drive(Throttle.of(xMove).into(AppliedThrottle),
+                Throttle.of(yMove).into(AppliedThrottle),
+                Throttle.of(hMove).into(AppliedThrottle));
 
         //if (toggle) {
         //    drive.drive(-xMove * StaticValues.getVoltageScalar(), Range.clip(-yMove * 1.67, StaticValues.getMinSpeed(), StaticValues.getMaxSpeed()) * StaticValues.getVoltageScalar(), hMove * StaticValues.getVoltageScalar());
@@ -167,6 +176,8 @@ public class DefaultGoToPointCommand extends CommandBase {
         } else {
             isZeroVelocity = false;
         }
+
+        Fate.log("GTPC/Target", target, PositionConstants.poseSchema);
 
 
     }

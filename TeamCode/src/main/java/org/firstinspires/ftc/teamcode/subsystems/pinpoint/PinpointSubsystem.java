@@ -16,7 +16,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
+import org.firstinspires.ftc.teamcode.subsystems.PositionConstants;
 
+import java.util.Arrays;
+
+import gay.zharel.fateweaver.schemas.CustomStructSchema;
+import gay.zharel.fateweaver.schemas.DoubleSchema;
+import gay.zharel.fateweaver.telemetry.Fate;
 
 
 @Config
@@ -25,10 +31,10 @@ public class PinpointSubsystem extends SubsystemBase {
     Pose2D pose = new Pose2D(INCH, 0, 0, AngleUnit.DEGREES, 0);
     GoBildaPinpointDriver.DeviceStatus deviceStatus = GoBildaPinpointDriver.DeviceStatus.NOT_READY;
 
-    public static boolean flipX = true;
+    public static boolean flipX = false;
     public static boolean flipY = true;
-    public static double xEncOffset = -1.5748;
-    public static double yEncOffset = -7.5;
+    public static double xEncOffset = 2.8;
+    public static double yEncOffset = -3.8;
 
     private Pose2D lastGoodPose = new Pose2D(INCH, 0, 0, AngleUnit.DEGREES, 0);
     //FieldD fieldDrawing = new FieldDrawing();
@@ -81,6 +87,9 @@ public class PinpointSubsystem extends SubsystemBase {
             deviceStatus = pinpoint.getDeviceStatus();
         }
         //fieldDrawing.drawRobot(getPose());
+
+        // log pose
+        Fate.log("Pinpoint/robotPose", getPose(), PositionConstants.poseSchema);
     }
 
     private Pose2D getSDKPose() {
