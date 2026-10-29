@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.pinpoint;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.INCH;
+import static org.firstinspires.ftc.teamcode.subsystems.lib.Util.Pose2DConverter;
 
 import android.util.Log;
 
@@ -24,12 +25,13 @@ public class PinpointSubsystem extends SubsystemBase {
     Pose2D pose = new Pose2D(INCH, 0, 0, AngleUnit.DEGREES, 0);
     GoBildaPinpointDriver.DeviceStatus deviceStatus = GoBildaPinpointDriver.DeviceStatus.NOT_READY;
 
-    public static boolean flipX = false;
+    public static boolean flipX = true;
     public static boolean flipY = true;
-    public static double xEncOffset = 2.8;
-    public static double yEncOffset = -3.8;
+    public static double xEncOffset = -1.5748;
+    public static double yEncOffset = -7.5;
 
     private Pose2D lastGoodPose = new Pose2D(INCH, 0, 0, AngleUnit.DEGREES, 0);
+    //FieldD fieldDrawing = new FieldDrawing();
     double turretOffsetX = -81 / 25.4;
     Pose2d offset = new Pose2d(0, 0, new Rotation2d(0));
 
@@ -42,7 +44,7 @@ public class PinpointSubsystem extends SubsystemBase {
         pinpoint.recalibrateIMU();
 
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-        
+
         pinpoint.setEncoderDirections(
                 flipX
                         ? GoBildaPinpointDriver.EncoderDirection.REVERSED
@@ -53,6 +55,7 @@ public class PinpointSubsystem extends SubsystemBase {
         pinpoint.setOffsets(xEncOffset, yEncOffset, INCH);
         // reset();
         deviceStatus = pinpoint.getDeviceStatus();
+        //fieldDrawing = new FieldDrawing();
     }
 
     @Override
@@ -77,6 +80,7 @@ public class PinpointSubsystem extends SubsystemBase {
             Log.i("%Pinpoint Status Change", pinpoint.getDeviceStatus().toString());
             deviceStatus = pinpoint.getDeviceStatus();
         }
+        //fieldDrawing.drawRobot(getPose());
     }
 
     private Pose2D getSDKPose() {
@@ -94,22 +98,25 @@ public class PinpointSubsystem extends SubsystemBase {
                 Rotation2d.fromDegrees(getSDKPose().getHeading(AngleUnit.DEGREES)).plus(offset.getRotation()));
     }
 
+    public void setPose(Pose2d pose) {
+        pinpoint.setPosition(Pose2DConverter(pose));
+    }
 
     public void setTranslation(Translation2d translation) {
         pinpoint.setPosition(new Pose2D(INCH, translation.getX(), translation.getY(), AngleUnit.DEGREES, pinpoint.getHeading(AngleUnit.DEGREES)));
     }
 
-
+    //@Override
     public void update() {
         pinpoint.update();
     }
 
-
+    //@Override
     public Rotation2d getHeading() {
         return getPose().getRotation();
     }
 
-
+    //@Override
     public Translation2d getTranslation() {
         return getPose().getTranslation();
     }
@@ -125,12 +132,12 @@ public class PinpointSubsystem extends SubsystemBase {
                 Rotation2d.fromDegrees(pinpoint.getHeadingVelocity(UnnormalizedAngleUnit.DEGREES)));
     }
 
-
+    //@Override
     public Rotation2d getAngularVelocity() {
         return getVelocity().getRotation();
     }
 
-
+    //@Override
     public Translation2d getTranslationalVelocity() {
         return getVelocity().getTranslation();
     }
@@ -156,4 +163,5 @@ public class PinpointSubsystem extends SubsystemBase {
     }
 
 }
+
 

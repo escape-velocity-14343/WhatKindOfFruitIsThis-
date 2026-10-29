@@ -64,6 +64,8 @@ public class CompetitionTeleOp extends LinearOpMode {
             for (LynxModule hub : hubs) {
                 hub.clearBulkCache();
             }
+            PositionConstants.rightGoalIsUp = !(pinpoint.getTranslation().getY() > 0);
+            telemetry.addData("goal pos", PositionConstants.rightGoalIsUp);
             //CommandScheduler.
             //CommandScheduler.getInstance().run();
             //shooter.turret.setDegrees(turretAngle);
@@ -74,10 +76,11 @@ public class CompetitionTeleOp extends LinearOpMode {
             telemetry.addData("Counter roller RPM", shooter.rollers.getCurrentVelocity());
             pinpoint.periodic();
             drive.driveFC(-gamepad1.left_stick_y, -gamepad1.left_stick_x, gamepad1.right_stick_x, pinpoint.getHeading().getRadians());
-            if (gamepad1.x){
-                hood.max();
-            }
-            if(gamepad1.y){hood.min();}
+            //if (gamepad1.x){
+            //    hood.max();
+            //}
+            //if(gamepad1.y){hood.min();}
+
             hood.max();
 
             if (gamepad1.a){
@@ -92,7 +95,7 @@ public class CompetitionTeleOp extends LinearOpMode {
                 intake.setPower(-0.5);
                 transfer.reject();
             }
-            else if (gamepad1.right_trigger > 0.5 && Math.abs(shooter.flywheel.getCurrentVelocity().into(RotationsPerMinute) - shooterVelocity) < 280) {
+            else if (gamepad1.right_trigger > 0.5 && Math.abs(shooter.flywheel.getCurrentVelocity().into(RotationsPerMinute) - shooter.flywheel.getCurrentTargetVelocity().into(RotationsPerMinute)) < 280) {
                     transfer.transfer();
                     intake.setPower(1);
             }
@@ -115,14 +118,14 @@ public class CompetitionTeleOp extends LinearOpMode {
 ////                PositionConstants.goalX += 1;
 ////            }
 
-            if (gamepad1.dpadUpWasReleased()){
-                shooterVelocity -= 50;
-                if (shooterVelocity > 6000){
-                    shooterVelocity = 6000;
-                }
-            } else if (gamepad1.dpadDownWasReleased()) {
-                shooterVelocity += 50;
-            }
+            //if (gamepad1.dpadUpWasReleased()){
+            //    shooterVelocity -= 50;
+            //    if (shooterVelocity > 6000){
+            //        shooterVelocity = 6000;
+            //    }
+            //} else if (gamepad1.dpadDownWasReleased()) {
+            //    shooterVelocity += 50;
+            //}
 
 //            if (gamepad1.right_bumper) {
 //                //shooter.flywheel.setTargetVelocity(RotationsPerMinute.of(shooterVelocity));
@@ -131,7 +134,7 @@ public class CompetitionTeleOp extends LinearOpMode {
 //                shooter.flywheel.setTargetVelocity(RotationsPerMinute.of(0));
 //                shooter.rollers.setPower(0);
 //            }
-            shooter.flywheel.setTargetVelocity(RotationsPerMinute.of(shooterVelocity));
+//            shooter.flywheel.setTargetVelocity(RotationsPerMinute.of(shooterVelocity));
             shooter.rollers.setPower(Throttle.of(1).into(AppliedThrottle));
 
             double distanceToGoal = pinpoint.getPose().getTranslation().getDistance(PositionConstants.getGoalPose().getTranslation());

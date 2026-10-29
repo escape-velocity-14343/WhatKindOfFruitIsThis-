@@ -89,6 +89,10 @@ public class FlywheelBaseSubsystem extends SubsystemBase {
         return this.currentVelocity;
     }
 
+    public AngularVelocity getCurrentTargetVelocity(){
+        return this.targetVelocity;
+    }
+
     public void setPower(double power) {
         flywheelMotors.forEach((m) -> m.setPower(power));
     }

@@ -5,7 +5,10 @@ import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.arcrobotics.ftclib.geometry.Transform2d;
 import com.arcrobotics.ftclib.geometry.Translation2d;
+import com.arcrobotics.ftclib.util.InterpLUT;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.Range;
+
 import dev.nextftc.units.measuretypes.Angle;
 import dev.nextftc.units.measuretypes.AngularVelocity;
 import gay.zharel.fateweaver.schemas.CustomStructSchema;
@@ -27,7 +30,10 @@ import static dev.nextftc.units.Units.*;
 // ok hello basically this one does all the aiming calculations and the other
 // smaller ones do all the everything else ok thank you bye
 public class ShooterSubsystem extends SubsystemBase {
-
+    InterpLUT pollenVelocity = new InterpLUT();
+    InterpLUT nectarVelocity = new InterpLUT();
+    public boolean shootingPollen = true;
+    InterpLUT using = pollenVelocity;
     /**
      * which thing are we shooting
      */
@@ -78,6 +84,15 @@ public class ShooterSubsystem extends SubsystemBase {
             ShooterElement.POLLEN
     );
     public ShooterSubsystem(HardwareMap hardwareMap) {
+        pollenVelocity.add(35, -2200);
+        pollenVelocity.add(40, -2050);
+        pollenVelocity.add(45, -2300);
+        pollenVelocity.add(60, -2400);
+        pollenVelocity.add(75, -2700);
+        pollenVelocity.add(88, -2900);
+        pollenVelocity.createLUT();
+
+
         this.rollers = new CounterrollerSubsystem(hardwareMap);
         this.flywheel = new FlywheelSubsystem(hardwareMap);
         this.hood = new HoodSubsystem(hardwareMap);
@@ -96,7 +111,7 @@ public class ShooterSubsystem extends SubsystemBase {
 //        this.hood.setAngle(state.hoodAngle);
         this.turret.setDegrees(state.turretAngle.into(Degrees));
         //this.rail.set(state.element);
-
+        flywheel.setTargetVelocity(RotationsPerMinute.of(pollenVelocity.get(Range.clip(robotPose.getTranslation().getDistance(PositionConstants.getGoalPose().getTranslation()),35.1, 87.9))));
         Fate.log("Shooter/TargetState", state, shooterStateSchema);
         Fate.log("Shooter/CurrentState", new ShooterState(
                 rollers.getCurrentVelocity(),
