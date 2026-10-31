@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 public class RailSubsystem2 extends SubsystemBase {
     public static double railPollenPos = 0.82; //0.85;
     public static double railNectarPos = 0.94;
+    private boolean isPollen = true;
     Servo railServo;
     public RailSubsystem2(HardwareMap hwMap){
         railServo = hwMap.get(Servo.class, "railServo");
@@ -27,8 +28,14 @@ public class RailSubsystem2 extends SubsystemBase {
 
     public void pollen(){
         railServo.setPosition(railPollenPos);
+        isPollen = true;
     }
     public void nectar(){
         railServo.setPosition(railNectarPos);
+        isPollen = false;
+    }
+
+    public boolean getIsPollen() {
+        return this.isPollen;
     }
 }

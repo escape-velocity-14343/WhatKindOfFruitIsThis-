@@ -20,7 +20,7 @@ public class ShooterTuner2 extends LinearOpMode {
         ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap);
 
         IntakeSubsystem intake = new IntakeSubsystem(hardwareMap);
-        TransferSubsystem transfer = new TransferSubsystem(hardwareMap);
+        TransferSubsystem transfer = new TransferSubsystem(hardwareMap, () -> true);
         waitForStart();
         intake.on();
         transfer.intake();

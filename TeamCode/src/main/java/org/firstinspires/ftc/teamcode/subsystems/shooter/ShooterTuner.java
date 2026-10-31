@@ -32,6 +32,7 @@ public class ShooterTuner extends LinearOpMode {
     public static boolean enableIntakeTransfer = true;
     private IntakeSubsystem intake = null;
     private TransferSubsystem transfer = null;
+    public static boolean isPollen = false;
 
     @Override
     public void runOpMode() {
@@ -48,7 +49,7 @@ public class ShooterTuner extends LinearOpMode {
 
         if (enableIntakeTransfer) {
             intake = new IntakeSubsystem(hardwareMap);
-            transfer = new TransferSubsystem(hardwareMap);
+            transfer = new TransferSubsystem(hardwareMap, () -> isPollen);
         }
 
         waitForStart();

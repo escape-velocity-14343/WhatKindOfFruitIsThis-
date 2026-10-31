@@ -5,16 +5,22 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import java.util.function.BooleanSupplier;
+
 
 @Config
 public class TransferSubsystem extends SubsystemBase {
 
     public static double transferIntakeSpeed = 1;
-    public static double transferTransferSpeed = 1;
+    public static double transferPollenTransferSpeed = 0.7;
+    public static double transferNectarTransferSpeed = 1;
     public static double transferRejectSpeed = -0.3;
+
+    private BooleanSupplier isPollen;
     DcMotor transferMotor;
-    public TransferSubsystem(HardwareMap hardwareMap) {
+    public TransferSubsystem(HardwareMap hardwareMap, BooleanSupplier isPollen) {
         transferMotor = hardwareMap.get(DcMotor.class, "transferMotor");
+        this.isPollen = isPollen;
     }
 
     public void setPower(double power) {
@@ -22,7 +28,11 @@ public class TransferSubsystem extends SubsystemBase {
     }
 
     public void transfer() {
-        setPower(transferTransferSpeed);
+        if (isPollen.getAsBoolean()) {
+            setPower(transferPollenTransferSpeed);
+        } else {
+            setPower(transferNectarTransferSpeed);
+        }
     }
 
     public void intake() {

@@ -14,17 +14,14 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.subsystems.DefaultGoToPointCommand;
-import org.firstinspires.ftc.teamcode.subsystems.GoToPointWithDefaultCommand;
-import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.PositionConstants;
-import org.firstinspires.ftc.teamcode.subsystems.TransferOnCommand;
-import org.firstinspires.ftc.teamcode.subsystems.TransferSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.*;
 import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeOnCommand;
 import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.pinpoint.PinpointSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.FlywheelBaseSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.RollersOffCommand;
+import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.RollersOnCommand;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.rail.RailSubsystem2;
 
 import java.util.List;
@@ -42,9 +39,9 @@ public class Auto extends LinearOpMode {
         PositionConstants.rightGoalIsUp = true;
 
         IntakeSubsystem intake = new IntakeSubsystem(hardwareMap);
-        TransferSubsystem transfer = new TransferSubsystem(hardwareMap);
         ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap);
         RailSubsystem2 rail = new RailSubsystem2(hardwareMap);
+        TransferSubsystem transfer = new TransferSubsystem(hardwareMap, rail::getIsPollen);
         PinpointSubsystem pinpoint = new PinpointSubsystem(hardwareMap);
         drive = new MecanumDriveSubsystem(hardwareMap, () -> pinpoint.getHeading().getRadians());
         toPoint = new DefaultGoToPointCommand(drive, pinpoint, new Pose2d(-31.15, -66.12, Rotation2d.fromDegrees(180)));
@@ -68,12 +65,15 @@ public class Auto extends LinearOpMode {
 
         CommandScheduler.getInstance().schedule(
                 new SequentialCommandGroup(
+                        new RollersOnCommand(shooter),
                         new WaitCommand(200),
                         new WaitUntilCommand(() -> shooter.flywheel.getCurrentTargetVelocity()
                                 .minus(shooter.flywheel.getCurrentVelocity())
                                 .isNear(RotationsPerMinute.of(0.0), RotationsPerMinute.of(200.0))),
                         new TransferOnCommand(transfer, intake),
                         new WaitCommand(1000),
+                        new RollersOffCommand(shooter),
+                        new TransferOffCommand(transfer, intake),
                         new GoToPointWithDefaultCommand(new Pose2d(-61.8, -66.4, Rotation2d.fromDegrees(180)), toPoint)
                 )
         );

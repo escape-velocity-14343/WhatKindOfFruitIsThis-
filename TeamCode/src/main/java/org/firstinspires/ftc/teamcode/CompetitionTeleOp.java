@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import gay.zharel.fateweaver.telemetry.Fate;
 import org.firstinspires.ftc.teamcode.subsystems.PositionConstants;
 import org.firstinspires.ftc.teamcode.subsystems.spool.LowerRampCommand;
 import org.firstinspires.ftc.teamcode.subsystems.spool.RaiseRampCommand;
@@ -28,6 +29,8 @@ import org.firstinspires.ftc.teamcode.subsystems.TransferSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.hood.HoodSubsystem2;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.rail.RailSubsystem2;
+
+import static gay.zharel.fastlane.UnitsKt.*;
 
 import java.util.List;
 
@@ -46,7 +49,7 @@ public class CompetitionTeleOp extends LinearOpMode {
         HoodSubsystem2 hood = new HoodSubsystem2(hardwareMap);
         RailSubsystem2 rail = new RailSubsystem2(hardwareMap);
         IntakeSubsystem intake = new IntakeSubsystem(hardwareMap);
-        TransferSubsystem transfer = new TransferSubsystem(hardwareMap);
+        TransferSubsystem transfer = new TransferSubsystem(hardwareMap, rail::getIsPollen);
         ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap);
         PinpointSubsystem pinpoint = new PinpointSubsystem(hardwareMap);
         RampSpoolSubsystem spool = new RampSpoolSubsystem(hardwareMap);
@@ -107,14 +110,17 @@ public class CompetitionTeleOp extends LinearOpMode {
             if (gamepad1.left_bumper) {
                 intake.setPower(-0.5);
                 transfer.reject();
+                shooter.rollers.setPower(0.0);
             }
             else if (gamepad1.right_trigger > 0.5 && Math.abs(shooter.flywheel.getCurrentVelocity().into(RotationsPerMinute) - shooter.flywheel.getCurrentTargetVelocity().into(RotationsPerMinute)) < 280) {
                     transfer.transfer();
                     intake.setPower(1);
+                    shooter.rollers.setPower(Throttle.of(1).into(AppliedThrottle));
             }
             else {
                     intake.on();
                     transfer.off();
+                    shooter.rollers.setPower(0.0);
             }
             if (gamepad1.options) {
                 imu.resetYaw();
@@ -165,6 +171,7 @@ public class CompetitionTeleOp extends LinearOpMode {
 
             shooter.update(pinpoint.getPose(), telemetry); // QWC
 
+            Fate.log("Util/LoopMs", loopTime.milliseconds());
             loopTime.reset();
 
             shooter.flywheel.periodic();
