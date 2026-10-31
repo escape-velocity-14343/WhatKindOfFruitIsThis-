@@ -15,6 +15,8 @@ import gay.zharel.fateweaver.schemas.CustomStructSchema;
 import gay.zharel.fateweaver.schemas.DoubleSchema;
 import gay.zharel.fateweaver.schemas.EnumSchema;
 import gay.zharel.fateweaver.telemetry.Fate;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.subsystems.PositionConstants;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.CounterrollerSubsystem;
@@ -22,6 +24,8 @@ import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.FlywheelSubsys
 import org.firstinspires.ftc.teamcode.subsystems.shooter.hood.HoodSubsystem;
 //import org.firstinspires.ftc.teamcode.subsystems.shooter.rail.RailSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.turret.TurretSubsystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
@@ -32,10 +36,11 @@ import static gay.zharel.fastlane.UnitsKt.Throttle;
 // ok hello basically this one does all the aiming calculations and the other
 // smaller ones do all the everything else ok thank you bye
 public class ShooterSubsystem extends SubsystemBase {
-    InterpLUT pollenVelocity = new InterpLUT();
-    InterpLUT nectarVelocity = new InterpLUT();
+    private static final Logger log = LoggerFactory.getLogger(ShooterSubsystem.class);
+    public InterpLUT pollenVelocity = new InterpLUT();
+    public InterpLUT nectarVelocity = new InterpLUT();
     public boolean shootingPollen = true;
-    InterpLUT using = pollenVelocity;
+    public InterpLUT using = pollenVelocity;
     /**
      * which thing are we shooting
      */
@@ -94,6 +99,12 @@ public class ShooterSubsystem extends SubsystemBase {
         pollenVelocity.add(88, -2900);
         pollenVelocity.createLUT();
 
+        nectarVelocity.add(35, -2900);
+        nectarVelocity.add(45, -3050);
+        nectarVelocity.add(60, -3600);
+        nectarVelocity.add(75, -3700);
+        nectarVelocity.add(86, -3900);
+        nectarVelocity.createLUT();
 
         this.rollers = new CounterrollerSubsystem(hardwareMap);
         this.flywheel = new FlywheelSubsystem(hardwareMap);
@@ -105,7 +116,7 @@ public class ShooterSubsystem extends SubsystemBase {
     /**
      * implement when we start actually aiming! sets all the targets that we want
      */
-    public void update(Pose2d robotPose) {
+    public void update(Pose2d robotPose, Telemetry telemetry) {
         this.state = calculateTargetShooterState(robotPose);
 
 //        this.rollers.setTargetVelocity(state.rollerAngVel);
@@ -115,7 +126,7 @@ public class ShooterSubsystem extends SubsystemBase {
         //this.rail.set(state.element);
         flywheel.setTargetVelocity(state.flywheelAngVel);
         rollers.setPower(Throttle.of(1).into(AppliedThrottle));
-
+        telemetry.addData("flywheel velocity", state.flywheelAngVel);
         Fate.log("Shooter/TargetState", state, shooterStateSchema);
         Fate.log("Shooter/CurrentState", new ShooterState(
                 flywheel.getCurrentVelocity(),
@@ -141,7 +152,7 @@ public class ShooterSubsystem extends SubsystemBase {
                         -robotPose.getRotation().getRadians()))
                 .times(-1);
 
-        AngularVelocity flywheelVelocity = RotationsPerMinute.of(pollenVelocity.get(Range.clip(robotPose.getTranslation().getDistance(PositionConstants.getGoalPose().getTranslation()),35.1, 87.9)));
+        AngularVelocity flywheelVelocity = RotationsPerMinute.of(using.get(Range.clip(robotPose.getTranslation().getDistance(PositionConstants.getGoalPose().getTranslation()),35.1, 87.9)));
 
         return new ShooterState(
                 flywheelVelocity,

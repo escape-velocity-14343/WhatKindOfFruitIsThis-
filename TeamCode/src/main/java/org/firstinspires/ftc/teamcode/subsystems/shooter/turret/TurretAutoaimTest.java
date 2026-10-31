@@ -28,7 +28,7 @@ public class TurretAutoaimTest extends LinearOpMode {
             pinpoint.periodic();
 
             mecanum.drive(-gamepad1.left_stick_y, -gamepad1.left_stick_x, gamepad1.right_stick_x);
-            shooter.update(pinpoint.getPose());
+            shooter.update(pinpoint.getPose(), telemetry);
 
             telemetry.addData("target shooter degrees", shooter.state.turretAngle.into(Degrees));
             telemetry.addData("Pinpoint pose", pinpoint.getPose());

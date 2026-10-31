@@ -6,6 +6,8 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.geometry.Pose2d;
+import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -15,6 +17,8 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.subsystems.PositionConstants;
+import org.firstinspires.ftc.teamcode.subsystems.spool.LowerRampCommand;
+import org.firstinspires.ftc.teamcode.subsystems.spool.RaiseRampCommand;
 import org.firstinspires.ftc.teamcode.subsystems.spool.RampSpoolSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.pinpoint.PinpointSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeSubsystem;
@@ -45,6 +49,7 @@ public class CompetitionTeleOp extends LinearOpMode {
         TransferSubsystem transfer = new TransferSubsystem(hardwareMap);
         ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap);
         PinpointSubsystem pinpoint = new PinpointSubsystem(hardwareMap);
+        RampSpoolSubsystem spool = new RampSpoolSubsystem(hardwareMap);
 
         MecanumDriveSubsystem drive = new MecanumDriveSubsystem(hardwareMap, () -> pinpoint.getHeading().getRadians());
         IMU.Parameters params = new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD, RevHubOrientationOnRobot.UsbFacingDirection.LEFT));
@@ -64,7 +69,7 @@ public class CompetitionTeleOp extends LinearOpMode {
             for (LynxModule hub : hubs) {
                 hub.clearBulkCache();
             }
-            PositionConstants.rightGoalIsUp = !(pinpoint.getTranslation().getY() > 0);
+            PositionConstants.rightGoalIsUp = !(pinpoint.getTranslation().getY() > 5);
             telemetry.addData("goal pos", PositionConstants.rightGoalIsUp);
             //CommandScheduler.
             //CommandScheduler.getInstance().run();
@@ -81,13 +86,21 @@ public class CompetitionTeleOp extends LinearOpMode {
             //}
             //if(gamepad1.y){hood.min();}
 
+            if (gamepad1.right_bumper){
+                spool.lower();
+            } else {
+                spool.raise();
+            }
+
             hood.max();
 
             if (gamepad1.a){
                 rail.pollen();
+                shooter.using = shooter.pollenVelocity;
             }
             if (gamepad1.b){
                 rail.nectar();
+                shooter.using = shooter.nectarVelocity;
             }
             //rail.pollen();
 
@@ -107,7 +120,7 @@ public class CompetitionTeleOp extends LinearOpMode {
                 imu.resetYaw();
                 pinpoint.resetIMU();
                 if (gamepad1.dpad_down){
-                    pinpoint.reset();
+                    pinpoint.setPose(new Pose2d(0,0, Rotation2d.fromDegrees(0)));
                 }
             }
 
@@ -150,7 +163,7 @@ public class CompetitionTeleOp extends LinearOpMode {
             telemetry.addData("distance to goal", distanceToGoal);
             telemetry.update();
 
-            shooter.update(pinpoint.getPose()); // QWC
+            shooter.update(pinpoint.getPose(), telemetry); // QWC
 
             loopTime.reset();
 

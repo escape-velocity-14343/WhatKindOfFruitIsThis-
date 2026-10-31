@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 @Config
 public class RailSubsystem2 extends SubsystemBase {
     public static double railPollenPos = 0.82; //0.85;
-    public static double railNectarPos = 0.90;
+    public static double railNectarPos = 0.94;
     Servo railServo;
     public RailSubsystem2(HardwareMap hwMap){
         railServo = hwMap.get(Servo.class, "railServo");

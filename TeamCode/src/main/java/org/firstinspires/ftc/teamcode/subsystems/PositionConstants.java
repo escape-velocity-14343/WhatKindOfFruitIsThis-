@@ -16,7 +16,7 @@ import gay.zharel.fateweaver.schemas.DoubleSchema;
  */
 @Config
 public class PositionConstants {
-    public static double goalX = -16.2;  // -12.75
+    public static double goalX = -12.2;  // -12.75
     public static double goalY = 18.5820411442;
     public static Pose2d LEFT_GOAL_POSE = new Pose2d(goalX, goalY, new Rotation2d());
     public static Pose2d RIGHT_GOAL_POSE = new Pose2d(LEFT_GOAL_POSE.getX(), -LEFT_GOAL_POSE.getY(), LEFT_GOAL_POSE.getRotation());

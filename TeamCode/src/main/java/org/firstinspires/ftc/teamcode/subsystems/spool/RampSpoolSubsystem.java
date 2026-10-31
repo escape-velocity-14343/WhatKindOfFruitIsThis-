@@ -1,16 +1,18 @@
 package org.firstinspires.ftc.teamcode.subsystems.spool;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
+@Config
 public class RampSpoolSubsystem extends SubsystemBase {
     private Servo spoolServo;
 
-    public static double raisedPos = 0.2;
-    public static double loweredPos = 0.7;
+    public static double raisedPos = 0.5;
+    public static double loweredPos = 1;
 
     public enum RampState {
         RAISED,
@@ -21,7 +23,7 @@ public class RampSpoolSubsystem extends SubsystemBase {
     private RampState state = RampState.UNKOWN;
 
     public RampSpoolSubsystem(HardwareMap hardwareMap) {
-        spoolServo = hardwareMap.get(Servo.class, "ramp_spool_servo");
+        spoolServo = hardwareMap.get(Servo.class, "flowerServo");
     }
 
     public void lower() {

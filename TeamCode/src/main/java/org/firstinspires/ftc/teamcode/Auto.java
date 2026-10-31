@@ -9,8 +9,10 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.subsystems.DefaultGoToPointCommand;
 import org.firstinspires.ftc.teamcode.subsystems.GoToPointWithDefaultCommand;
@@ -24,6 +26,10 @@ import org.firstinspires.ftc.teamcode.subsystems.pinpoint.PinpointSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.FlywheelBaseSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.rail.RailSubsystem2;
+
+import java.util.List;
+
+import gay.zharel.fateweaver.telemetry.Fate;
 
 @Autonomous
 public class Auto extends LinearOpMode {
@@ -45,7 +51,15 @@ public class Auto extends LinearOpMode {
         rail.pollen();
         shooter.turret.setDegrees(90);
 
+        pinpoint.reset();
+
         pinpoint.setPose(new Pose2d(-31.15, -66.12, Rotation2d.fromDegrees(180)));
+
+        List<LynxModule> hubs = hardwareMap.getAll(LynxModule.class);
+        for (LynxModule hub : hubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
+
         waitForStart();
 
         CommandScheduler.getInstance().schedule(
@@ -63,9 +77,17 @@ public class Auto extends LinearOpMode {
                         new GoToPointWithDefaultCommand(new Pose2d(-61.8, -66.4, Rotation2d.fromDegrees(180)), toPoint)
                 )
         );
+
+        ElapsedTime loopTime = new ElapsedTime();
         while (opModeIsActive()){
+            for (LynxModule hub : hubs) {
+                hub.clearBulkCache();
+            }
+
             CommandScheduler.getInstance().run();
-            shooter.update(pinpoint.getPose());
+            shooter.update(pinpoint.getPose(), telemetry);
+            Fate.log("Util/LoopMs", loopTime.milliseconds());
+            loopTime.reset();
         }
     }
 }
