@@ -13,7 +13,7 @@ public class HoodSubsystem2 extends SubsystemBase {
     Servo hoodServo;
 
     public HoodSubsystem2(HardwareMap hwMap){
-        hoodServo = hwMap.get(ServoImpl.class, "hood");
+        hoodServo = hwMap.get(ServoImpl.class, "hoodServo");
     }
 
     public void setPos(double pos){
