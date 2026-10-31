@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems.lib;//package org.firstinspires.ftc.teamcode.lib;
+//package org.firstinspires.ftc.teamcode.subsystems.lib;//package org.firstinspires.ftc.teamcode.lib;
 //
 //import android.graphics.Color;
 //import android.util.Log;
@@ -7,7 +7,6 @@ package org.firstinspires.ftc.teamcode.subsystems.lib;//package org.firstinspire
 //import com.qualcomm.robotcore.hardware.HardwareMap;
 //
 //import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-//import org.firstinspires.ftc.teamcode.subsystems.spindexer.ConstantsSpindexer;
 //
 //public class RevColorSensorDetector implements ArtifactSensor {
 //    RevColorSensorV3 colorSensor;
@@ -18,8 +17,7 @@ package org.firstinspires.ftc.teamcode.subsystems.lib;//package org.firstinspire
 //        colorSensor = hardwareMap.get(RevColorSensorV3.class, "colorSensor");
 //        colorSensor.setGain(5.9f);
 //    }
-//    @Override
-//    public boolean greenDetected() {
+//    public boolean pollenDector() {
 //        float[] hsvValues = new float[3];
 //        Color.colorToHSV(colorSensor.getNormalizedColors().toColor(), hsvValues);
 //        float hue = hsvValues[0];

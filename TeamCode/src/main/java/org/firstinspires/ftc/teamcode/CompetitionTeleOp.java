@@ -17,6 +17,8 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import gay.zharel.fateweaver.telemetry.Fate;
+
+import org.firstinspires.ftc.teamcode.subsystems.ColorSensorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.PositionConstants;
 import org.firstinspires.ftc.teamcode.subsystems.spool.LowerRampCommand;
 import org.firstinspires.ftc.teamcode.subsystems.spool.RaiseRampCommand;
@@ -53,6 +55,7 @@ public class CompetitionTeleOp extends LinearOpMode {
         ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap);
         PinpointSubsystem pinpoint = new PinpointSubsystem(hardwareMap);
         RampSpoolSubsystem spool = new RampSpoolSubsystem(hardwareMap);
+        ColorSensorSubsystem colorSensor = new ColorSensorSubsystem(hardwareMap);
 
         MecanumDriveSubsystem drive = new MecanumDriveSubsystem(hardwareMap, () -> pinpoint.getHeading().getRadians());
         IMU.Parameters params = new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD, RevHubOrientationOnRobot.UsbFacingDirection.LEFT));
@@ -97,14 +100,14 @@ public class CompetitionTeleOp extends LinearOpMode {
 
             hood.max();
 
-            if (gamepad1.a){
-                rail.pollen();
-                shooter.using = shooter.pollenVelocity;
-            }
-            if (gamepad1.b){
-                rail.nectar();
-                shooter.using = shooter.nectarVelocity;
-            }
+            //if (gamepad1.a){
+            //    rail.pollen();
+            //    shooter.using = shooter.pollenVelocity;
+            //}
+            //if (gamepad1.b){
+            //    rail.nectar();
+            //    shooter.using = shooter.nectarVelocity;
+            //}
             //rail.pollen();
 
             if (gamepad1.left_bumper) {
@@ -173,6 +176,12 @@ public class CompetitionTeleOp extends LinearOpMode {
 
             Fate.log("Util/LoopMs", loopTime.milliseconds());
             loopTime.reset();
+
+            if (colorSensor.proximityDetected() && !colorSensor.yellowDetected()){
+                    rail.nectar();
+            } else {
+                rail.pollen();
+            }
 
             shooter.flywheel.periodic();
             shooter.rollers.periodic();
