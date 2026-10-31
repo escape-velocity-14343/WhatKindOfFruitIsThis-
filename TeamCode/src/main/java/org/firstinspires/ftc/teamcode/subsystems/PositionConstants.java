@@ -30,12 +30,6 @@ public class PositionConstants {
     /**
      * relative to robot
      */
-    public static Translation2d TURRET_OFFSET = new Translation2d(-1, 0);
-
-    public static CustomStructSchema<Pose2d> poseSchema = new CustomStructSchema<Pose2d>(
-            "Pose2d",
-            Arrays.asList("x", "y", "heading"),
-            Arrays.asList(DoubleSchema.INSTANCE, DoubleSchema.INSTANCE, DoubleSchema.INSTANCE),
-            (Pose2d pose) -> Arrays.asList(pose.getX(), pose.getY(), pose.getRotation().getRadians()));
+    public static Translation2d TURRET_OFFSET = new Translation2d(0, 0);
 
 }

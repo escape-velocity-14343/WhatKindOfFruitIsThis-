@@ -27,6 +27,9 @@ import org.firstinspires.ftc.teamcode.subsystems.shooter.rail.RailSubsystem2;
 import java.util.List;
 
 import gay.zharel.fateweaver.telemetry.Fate;
+import org.firstinspires.ftc.teamcode.subsystems.spool.LowerRampCommand;
+import org.firstinspires.ftc.teamcode.subsystems.spool.RaiseRampCommand;
+import org.firstinspires.ftc.teamcode.subsystems.spool.RampSpoolSubsystem;
 
 @Autonomous
 public class Auto extends LinearOpMode {
@@ -43,12 +46,12 @@ public class Auto extends LinearOpMode {
         RailSubsystem2 rail = new RailSubsystem2(hardwareMap);
         TransferSubsystem transfer = new TransferSubsystem(hardwareMap, rail::getIsPollen);
         PinpointSubsystem pinpoint = new PinpointSubsystem(hardwareMap);
+        RampSpoolSubsystem spool = new RampSpoolSubsystem(hardwareMap);
         drive = new MecanumDriveSubsystem(hardwareMap, () -> pinpoint.getHeading().getRadians());
         toPoint = new DefaultGoToPointCommand(drive, pinpoint, new Pose2d(-31.15, -66.12, Rotation2d.fromDegrees(180)));
+        spool.raise();
         rail.pollen();
         shooter.turret.setDegrees(90);
-
-        pinpoint.reset();
 
         pinpoint.setPose(new Pose2d(-31.15, -66.12, Rotation2d.fromDegrees(180)));
 
@@ -65,16 +68,52 @@ public class Auto extends LinearOpMode {
 
         CommandScheduler.getInstance().schedule(
                 new SequentialCommandGroup(
+                        // preloads
+                        new RaiseRampCommand(spool),
                         new RollersOnCommand(shooter),
                         new WaitCommand(200),
                         new WaitUntilCommand(() -> shooter.flywheel.getCurrentTargetVelocity()
                                 .minus(shooter.flywheel.getCurrentVelocity())
-                                .isNear(RotationsPerMinute.of(0.0), RotationsPerMinute.of(200.0))),
+                                .isNear(RotationsPerMinute.of(0.0), RotationsPerMinute.of(180.0))),
                         new TransferOnCommand(transfer, intake),
                         new WaitCommand(1000),
                         new RollersOffCommand(shooter),
                         new TransferOffCommand(transfer, intake),
-                        new GoToPointWithDefaultCommand(new Pose2d(-61.8, -66.4, Rotation2d.fromDegrees(180)), toPoint)
+                        new InstantCommand(() -> PositionConstants.rightGoalIsUp = false),
+
+                        // garden
+                        new GoToPointWithDefaultCommand(new Pose2d(-70.8, -66.4, Rotation2d.fromDegrees(180)), toPoint, 3.0, 10.0)
+                                .withTimeout(2000),
+
+                        // traverse
+                        new GoToPointWithDefaultCommand(new Pose2d(-50, 48.0, Rotation2d.fromDegrees(90)), toPoint),
+                        new RollersOnCommand(shooter),
+                        new TransferOnCommand(transfer, intake),
+                        new WaitCommand(1000),
+                        new RollersOffCommand(shooter),
+                        new TransferOffCommand(transfer, intake),
+
+                        // flower intake
+                        new GoToPointWithDefaultCommand(new Pose2d(-24, 48.0, Rotation2d.fromDegrees(90)), toPoint, 3.0, 5.0),
+                        new LowerRampCommand(spool),
+                        new GoToPointWithDefaultCommand(new Pose2d(-24, 65, Rotation2d.fromDegrees(90)), toPoint, 1.0, 5.0)
+                                .withTimeout(2000),
+
+                        // flower shoot
+                        new RollersOnCommand(shooter),
+                        new GoToPointWithDefaultCommand(new Pose2d(-40, 40.0, Rotation2d.fromDegrees(180)), toPoint, 3.0, 10.0),
+                        new TransferOnCommand(transfer, intake),
+                        new WaitCommand(1000),
+                        new TransferOffCommand(transfer, intake),
+                        new RollersOffCommand(shooter),
+                        new RaiseRampCommand(spool),
+
+                        // wait for nectar!
+                        new WaitCommand(5000),
+
+                        // park
+                        new GoToPointWithDefaultCommand(new Pose2d(-54, 40.0, Rotation2d.fromDegrees(0)), toPoint, 1.0, 5.0)
+
                 )
         );
 

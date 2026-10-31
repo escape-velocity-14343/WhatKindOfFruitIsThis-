@@ -177,7 +177,7 @@ public class DefaultGoToPointCommand extends CommandBase {
             isZeroVelocity = false;
         }
 
-        Fate.log("GTPC/Target", target, PositionConstants.poseSchema);
+        Fate.log("GTPC/Target", target, LoggingConstants.poseSchema);
 
 
     }

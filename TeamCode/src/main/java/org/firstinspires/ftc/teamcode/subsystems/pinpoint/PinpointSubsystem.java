@@ -16,6 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
+import org.firstinspires.ftc.teamcode.subsystems.LoggingConstants;
 import org.firstinspires.ftc.teamcode.subsystems.PositionConstants;
 
 import java.util.Arrays;
@@ -89,7 +90,7 @@ public class PinpointSubsystem extends SubsystemBase {
         //fieldDrawing.drawRobot(getPose());
 
         // log pose
-        Fate.log("Pinpoint/robotPose", getPose(), PositionConstants.poseSchema);
+        Fate.log("Pinpoint/robotPose", getPose(), LoggingConstants.poseSchema);
     }
 
     private Pose2D getSDKPose() {
