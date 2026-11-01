@@ -90,7 +90,7 @@ public class Auto extends LinearOpMode {
                         new InstantCommand(() -> toPoint.maxTranslationPower = 1.0),
 
                         //gotoshoot2
-                        new GoToPointWithDefaultCommand(new Pose2d(-32.3, -64.8, Rotation2d.fromDegrees(180)), toPoint, 3.0, 10.0),
+                        new GoToPointWithDefaultCommand(new Pose2d(-32.3, -62.8, Rotation2d.fromDegrees(90)), toPoint, 3.0, 10.0),
                         new RollersOnCommand(shooter),
                         new WaitCommand(3000),
                         new SmartTransferCommand(shooter, transfer, intake, 2000),
@@ -136,7 +136,7 @@ public class Auto extends LinearOpMode {
                         //new SmartTransferCommand(shooter, transfer, intake, 4000),
 
                         // park
-                        new GoToPointWithDefaultCommand(new Pose2d(-58, 19, Rotation2d.fromDegrees(-90)), toPoint, 1.0, 5.0),
+                        new GoToPointWithDefaultCommand(new Pose2d(-61, 19, Rotation2d.fromDegrees(-90)), toPoint, 1.0, 5.0),
                         new InstantCommand(rail::nectar)
 
                 )

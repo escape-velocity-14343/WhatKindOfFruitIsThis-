@@ -138,6 +138,11 @@ public class CompetitionTeleOp extends LinearOpMode {
                     transfer.off();
                 }
             }
+            else if (gamepad1.left_trigger > 0.5){
+                intake.setPower(1);
+                transfer.setPower(0.8);
+                shooter.isUsingRollers = true;
+            }
             else {
                 intake.on();
                 transfer.off();
