@@ -115,10 +115,10 @@ public class CompetitionTeleOp extends LinearOpMode {
             //shooter.flywheel.setTargetVelocity(RotationsPerMinute.of(shooterVelocity));
             hood.max();
 
-            if (gamepad1.a){
+            if (gamepad2.a || gamepad1.a){
                 rail.pollen();
             }
-            if (gamepad1.b){
+            if (gamepad2.b || gamepad1.b){
                 rail.nectar();
             }
             //rail.pollen();
@@ -147,7 +147,7 @@ public class CompetitionTeleOp extends LinearOpMode {
                 imu.resetYaw();
                 pinpoint.resetIMU();
                 if (gamepad1.dpad_down){
-                    pinpoint.setPose(new Pose2d(0,0, Rotation2d.fromDegrees(0)));
+                    pinpoint.setPose(new Pose2d(-63.4,63.4, Rotation2d.fromDegrees(0)));
                 }
             }
 

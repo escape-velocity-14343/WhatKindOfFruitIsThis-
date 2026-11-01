@@ -73,7 +73,9 @@ public class Auto extends LinearOpMode {
                         // preloads
                         new RaiseRampCommand(spool),
                         new RollersOnCommand(shooter),
-                        new SmartTransferCommand(shooter, transfer, intake, 4000),
+                        new SmartTransferCommand(shooter, transfer, intake, 2000),
+                        new TransferOnCommand(transfer, intake),
+                        new WaitCommand(1000),
                         //new transfer
                         //new Transf
                         //new InstantCommand(()->transfer.transfer()).alongWith(new InstantCommand(()->intake.setPower(1))).alongWith(new WaitCommand(4000)),
@@ -83,50 +85,58 @@ public class Auto extends LinearOpMode {
                         new InstantCommand(() -> toPoint.maxTranslationPower = 0.4),
 
                         // garden
-                        new GoToPointWithDefaultCommand(new Pose2d(-67.3, -63.3, Rotation2d.fromDegrees(180)), toPoint, 3.0, 10.0)
+                        new GoToPointWithDefaultCommand(new Pose2d(-67.3, -64.8, Rotation2d.fromDegrees(180)), toPoint, 3.0, 10.0)
                                 .withTimeout(2000),
                         new InstantCommand(() -> toPoint.maxTranslationPower = 1.0),
 
                         //gotoshoot2
                         new GoToPointWithDefaultCommand(new Pose2d(-32.3, -64.8, Rotation2d.fromDegrees(180)), toPoint, 3.0, 10.0),
                         new RollersOnCommand(shooter),
-                        new SmartTransferCommand(shooter, transfer, intake, 4000),
+                        new WaitCommand(3000),
+                        new SmartTransferCommand(shooter, transfer, intake, 2000),
+                        new TransferOnCommand(transfer, intake),
+                        new WaitCommand(1000),
                         new RollersOffCommand(shooter),
 
                         //flower intake 1
-                        new LowerRampCommand(spool),
-                        new GoToPointWithDefaultCommand(new Pose2d(-58.0, -23.5, Rotation2d.fromDegrees(180)), toPoint, 3.0, 10.0),
+//                      //new LowerRampCommand(spool),
+//                      //new GoToPointWithDefaultCommand(new Pose2d(-58.0, -23.5, Rotation2d.fromDegrees(180)), toPoint, 3.0, 10.0),
 
                         //intermediate
                         new GoToPointWithDefaultCommand(new Pose2d(-44.5, -24.5, Rotation2d.fromDegrees(-90)), toPoint, 3, 10),
 
                         // traverse
-                        new GoToPointWithDefaultCommand(new Pose2d(-45, 48.0, Rotation2d.fromDegrees(-90)), toPoint),
-                        new WaitCommand(500),
-                        new RollersOnCommand(shooter),
-                        new SmartTransferCommand(shooter, transfer, intake, 4000),
-                        new RollersOffCommand(shooter),
+                        //new GoToPointWithDefaultCommand(new Pose2d(-45, 48.0, Rotation2d.fromDegrees(-90)), toPoint),
+//                      //new WaitCommand(500),
+//                      //new RollersOnCommand(shooter),
+//                      //new SmartTransferCommand(shooter, transfer, intake, 2000),
+//                      //new TransferOnCommand(transfer, intake),
+//                      //new WaitCommand(1000),
+//                      //new RollersOffCommand(shooter),
 
                         // flower intake
-                        new GoToPointWithDefaultCommand(new Pose2d(-24, 48.0, Rotation2d.fromDegrees(90)), toPoint, 3.0, 5.0),
-                        new LowerRampCommand(spool),
-                        new GoToPointWithDefaultCommand(new Pose2d(-24, 65, Rotation2d.fromDegrees(90)), toPoint, 1.0, 5.0)
-                                .withTimeout(2000),
+//                        //new GoToPointWithDefaultCommand(new Pose2d(-24, 48.0, Rotation2d.fromDegrees(90)), toPoint, 3.0, 5.0),
+////                      //  new LowerRampCommand(spool),
+//                        //new GoToPointWithDefaultCommand(new Pose2d(-24, 65, Rotation2d.fromDegrees(90)), toPoint, 1.0, 5.0)
+//                        //        .withTimeout(2000),
 
                         // flower shoot
-                        new RollersOnCommand(shooter),
-                        //new GoToPointWithDefaultCommand(new Pose2d(-40, 40.0, Rotation2d.fromDegrees(-90)), toPoint, 3.0, 10.0),
-                        new GoToPointWithDefaultCommand(new Pose2d(-44, 40.0, Rotation2d.fromDegrees(-170)), toPoint, 1.0, 5.0),
-                        new SmartTransferCommand(shooter, transfer, intake, 4000),
-                        //new RollersOffCommand(shooter),
-                        new RaiseRampCommand(spool),
+//                        //new RollersOnCommand(shooter),
+//                        //new GoToPointWithDefaultCommand(new Pose2d(-40, 40.0, Rotation2d.fromDegrees(-90)), toPoint, 3.0, 10.0),
+//                        //new GoToPointWithDefaultCommand(new Pose2d(-44, 40.0, Rotation2d.fromDegrees(-170)), toPoint, 1.0, 5.0),
+//                        //new SmartTransferCommand(shooter, transfer, intake, 2000),
+//                        //new TransferOnCommand(transfer, intake),
+//                        //new WaitCommand(1000),
+//                        //new RollersOffCommand(shooter),
+//                        //new RaiseRampCommand(spool),
 
                         // wait for nectar!
-                        new WaitCommand(5000),
-                        new SmartTransferCommand(shooter, transfer, intake, 4000),
+                        //new WaitCommand(5000),
+                        //new InstantCommand(rail::nectar),
+                        //new SmartTransferCommand(shooter, transfer, intake, 4000),
 
                         // park
-                        new GoToPointWithDefaultCommand(new Pose2d(-56, 24, Rotation2d.fromDegrees(-170)), toPoint, 1.0, 5.0),
+                        new GoToPointWithDefaultCommand(new Pose2d(-58, 19, Rotation2d.fromDegrees(-90)), toPoint, 1.0, 5.0),
                         new InstantCommand(rail::nectar)
 
                 )
