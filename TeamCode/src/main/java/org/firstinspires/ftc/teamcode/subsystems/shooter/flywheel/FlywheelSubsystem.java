@@ -19,7 +19,7 @@ public class FlywheelSubsystem extends FlywheelBaseSubsystem {
             "Flywheel"
     );
 
-    public static double toleranceRPM = 200.0;
+    public static double toleranceRPM = 100.0;
     public FlywheelSubsystem(HardwareMap hardwareMap) {
         super(config,
                 hardwareMap.get(DcMotorEx.class, "flywheelMotor"));

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import static dev.nextftc.units.Units.Degrees;
 import static dev.nextftc.units.Units.RotationsPerMinute;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -49,6 +50,7 @@ public class CompetitionTeleOp extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        CommandScheduler.getInstance().reset();
         telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), telemetry);
 
         List<LynxModule> hubs = hardwareMap.getAll(LynxModule.class);
@@ -89,6 +91,7 @@ public class CompetitionTeleOp extends LinearOpMode {
             //CommandScheduler.getInstance().run();
             //shooter.turret.setDegrees(turretAngle);
             //telemetry.addData("Turret Angle", turretAngle);
+            telemetry.addData("turretangle", shooter.state.turretAngle.into(Degrees));
             telemetry.addData("Shooter RPM", shooter.flywheel.getCurrentVelocity()
                     .into(RotationsPerMinute));
             telemetry.addData("Shooter Target RPM", shooter.flywheel.getCurrentTargetVelocity().into(RotationsPerMinute));

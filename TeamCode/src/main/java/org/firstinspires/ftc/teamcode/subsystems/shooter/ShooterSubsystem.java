@@ -108,7 +108,7 @@ public class ShooterSubsystem extends SubsystemBase {
         pollenVelocity.add(37.3, -2800);
         pollenVelocity.add(45.7, -2800);
         pollenVelocity.add(53, -2550);
-        pollenVelocity.add(58, -2600);
+        pollenVelocity.add(58, -2700);
         pollenVelocity.add(68, -2800);
         pollenVelocity.createLUT();
 
@@ -161,6 +161,7 @@ public class ShooterSubsystem extends SubsystemBase {
         //this.rail.set(state.element);
         flywheel.setTargetVelocity(state.flywheelAngVel);
         rollers.setTargetVelocity(state.rollerAngVel);
+        telemetry.addData("roller velocity", state.rollerAngVel);
         telemetry.addData("flywheel velocity", state.flywheelAngVel);
         Fate.log("Shooter/TargetState", state, shooterStateSchema);
         Fate.log("Shooter/CurrentState", new ShooterState(

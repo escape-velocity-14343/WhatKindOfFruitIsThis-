@@ -50,12 +50,12 @@ public class Auto extends LinearOpMode {
         PinpointSubsystem pinpoint = new PinpointSubsystem(hardwareMap);
         RampSpoolSubsystem spool = new RampSpoolSubsystem(hardwareMap);
         drive = new MecanumDriveSubsystem(hardwareMap, () -> pinpoint.getHeading().getRadians());
-        toPoint = new DefaultGoToPointCommand(drive, pinpoint, new Pose2d(-31.15, -66.12, Rotation2d.fromDegrees(180)));
+        toPoint = new DefaultGoToPointCommand(drive, pinpoint, new Pose2d(-32.3, -64.8, Rotation2d.fromDegrees(180)));
         spool.raise();
         rail.pollen();
         shooter.turret.setDegrees(90);
 
-        pinpoint.setPose(new Pose2d(-31.15, -66.12, Rotation2d.fromDegrees(180)));
+        pinpoint.setPose(new Pose2d(-32.3, -64.8, Rotation2d.fromDegrees(180)));
 
         List<LynxModule> hubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : hubs) {
@@ -73,22 +73,38 @@ public class Auto extends LinearOpMode {
                         // preloads
                         new RaiseRampCommand(spool),
                         new RollersOnCommand(shooter),
-                        new SmartTransferCommand(shooter, transfer, intake, 2000),
-                        new WaitCommand(1000),
+                        new SmartTransferCommand(shooter, transfer, intake, 4000),
+                        //new transfer
+                        //new Transf
+                        //new InstantCommand(()->transfer.transfer()).alongWith(new InstantCommand(()->intake.setPower(1))).alongWith(new WaitCommand(4000)),
                         new RollersOffCommand(shooter),
                         new TransferOffCommand(transfer, intake),
                         new InstantCommand(() -> PositionConstants.rightGoalIsUp = false),
                         new InstantCommand(() -> toPoint.maxTranslationPower = 0.4),
 
                         // garden
-                        new GoToPointWithDefaultCommand(new Pose2d(-70.8, -66.4, Rotation2d.fromDegrees(180)), toPoint, 3.0, 10.0)
+                        new GoToPointWithDefaultCommand(new Pose2d(-67.3, -63.3, Rotation2d.fromDegrees(180)), toPoint, 3.0, 10.0)
                                 .withTimeout(2000),
                         new InstantCommand(() -> toPoint.maxTranslationPower = 1.0),
 
+                        //gotoshoot2
+                        new GoToPointWithDefaultCommand(new Pose2d(-32.3, -64.8, Rotation2d.fromDegrees(180)), toPoint, 3.0, 10.0),
+                        new RollersOnCommand(shooter),
+                        new SmartTransferCommand(shooter, transfer, intake, 4000),
+                        new RollersOffCommand(shooter),
+
+                        //flower intake 1
+                        new LowerRampCommand(spool),
+                        new GoToPointWithDefaultCommand(new Pose2d(-58.0, -23.5, Rotation2d.fromDegrees(180)), toPoint, 3.0, 10.0),
+
+                        //intermediate
+                        new GoToPointWithDefaultCommand(new Pose2d(-44.5, -24.5, Rotation2d.fromDegrees(-90)), toPoint, 3, 10),
+
                         // traverse
                         new GoToPointWithDefaultCommand(new Pose2d(-45, 48.0, Rotation2d.fromDegrees(-90)), toPoint),
+                        new WaitCommand(500),
                         new RollersOnCommand(shooter),
-                        new SmartTransferCommand(shooter, transfer, intake, 2000),
+                        new SmartTransferCommand(shooter, transfer, intake, 4000),
                         new RollersOffCommand(shooter),
 
                         // flower intake
@@ -99,16 +115,19 @@ public class Auto extends LinearOpMode {
 
                         // flower shoot
                         new RollersOnCommand(shooter),
-                        new GoToPointWithDefaultCommand(new Pose2d(-40, 40.0, Rotation2d.fromDegrees(-90)), toPoint, 3.0, 10.0),
-                        new SmartTransferCommand(shooter, transfer, intake, 2000),
-                        new RollersOffCommand(shooter),
+                        //new GoToPointWithDefaultCommand(new Pose2d(-40, 40.0, Rotation2d.fromDegrees(-90)), toPoint, 3.0, 10.0),
+                        new GoToPointWithDefaultCommand(new Pose2d(-44, 40.0, Rotation2d.fromDegrees(-170)), toPoint, 1.0, 5.0),
+                        new SmartTransferCommand(shooter, transfer, intake, 4000),
+                        //new RollersOffCommand(shooter),
                         new RaiseRampCommand(spool),
 
                         // wait for nectar!
                         new WaitCommand(5000),
+                        new SmartTransferCommand(shooter, transfer, intake, 4000),
 
                         // park
-                        new GoToPointWithDefaultCommand(new Pose2d(-54, 40.0, Rotation2d.fromDegrees(0)), toPoint, 1.0, 5.0)
+                        new GoToPointWithDefaultCommand(new Pose2d(-56, 24, Rotation2d.fromDegrees(-170)), toPoint, 1.0, 5.0),
+                        new InstantCommand(rail::nectar)
 
                 )
         );
@@ -123,6 +142,7 @@ public class Auto extends LinearOpMode {
             shooter.update(pinpoint.getPose(), telemetry);
             Fate.log("Util/LoopMs", loopTime.milliseconds());
             loopTime.reset();
+            telemetry.update();
         }
     }
 }

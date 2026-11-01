@@ -12,9 +12,10 @@ import java.util.function.BooleanSupplier;
 public class TransferSubsystem extends SubsystemBase {
 
     public static double transferIntakeSpeed = 1;
-    public static double transferPollenTransferSpeed = 0.7;
+    public static double transferPollenTransferSpeed = 0.4;
     public static double transferNectarTransferSpeed = 1;
     public static double transferRejectSpeed = -0.3;
+    public static double autoteansferSpeed = 0.5;
 
     private BooleanSupplier isPollen;
     DcMotor transferMotor;
