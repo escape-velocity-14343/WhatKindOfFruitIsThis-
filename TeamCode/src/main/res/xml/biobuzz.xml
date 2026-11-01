@@ -23,6 +23,7 @@
             <goBILDA5202SeriesMotor name="driveBackRight" port="3" />
             <LynxEmbeddedIMU name="imu" port="0" bus="0" />
             <goBILDAPinpoint name="pinpoint" port="0" bus="1"/>
+            <RevColorSensorV3 name="ballSensor" port="1" bus="0"/>
         </LynxModule>
     </LynxUsbDevice>
 </Robot>

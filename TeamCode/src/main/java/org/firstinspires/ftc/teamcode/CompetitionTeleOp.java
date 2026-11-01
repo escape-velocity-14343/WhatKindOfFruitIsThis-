@@ -20,6 +20,7 @@ import gay.zharel.fateweaver.telemetry.Fate;
 
 import org.firstinspires.ftc.teamcode.subsystems.ColorSensorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.PositionConstants;
+import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.CounterrollerSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.spool.LowerRampCommand;
 import org.firstinspires.ftc.teamcode.subsystems.spool.RaiseRampCommand;
 import org.firstinspires.ftc.teamcode.subsystems.spool.RampSpoolSubsystem;
@@ -36,9 +37,13 @@ import static gay.zharel.fastlane.UnitsKt.*;
 
 import java.util.List;
 
+
+@Config
 @TeleOp(name = "TeleOp")
 public class CompetitionTeleOp extends LinearOpMode {
-    int shooterVelocity = -5000;
+    public static int shooterVelocity = -5000;
+    public static double rollerThrottle = 1.0;
+    //public static double flywheelVelocity
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -55,7 +60,7 @@ public class CompetitionTeleOp extends LinearOpMode {
         ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap);
         PinpointSubsystem pinpoint = new PinpointSubsystem(hardwareMap);
         RampSpoolSubsystem spool = new RampSpoolSubsystem(hardwareMap);
-//        ColorSensorSubsystem colorSensor = new ColorSensorSubsystem(hardwareMap);
+        ColorSensorSubsystem colorSensor = new ColorSensorSubsystem(hardwareMap);
 
         MecanumDriveSubsystem drive = new MecanumDriveSubsystem(hardwareMap, () -> pinpoint.getHeading().getRadians());
         IMU.Parameters params = new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD, RevHubOrientationOnRobot.UsbFacingDirection.LEFT));
@@ -84,7 +89,8 @@ public class CompetitionTeleOp extends LinearOpMode {
             telemetry.addData("Shooter RPM", shooter.flywheel.getCurrentVelocity()
                     .into(RotationsPerMinute));
             telemetry.addData("Shooter Target RPM", shooterVelocity);
-            telemetry.addData("Counter roller RPM", shooter.rollers.getCurrentVelocity());
+            telemetry.addData("Counter roller RPM", shooter.rollers.getCurrentVelocity().into(RotationsPerMinute));
+            telemetry.addData("Counter roller Target RPM", shooter.rollers.getCurrentTargetVelocity().into(RotationsPerMinute));
             pinpoint.periodic();
             drive.driveFC(-gamepad1.left_stick_y, -gamepad1.left_stick_x, gamepad1.right_stick_x, pinpoint.getHeading().getRadians());
             //if (gamepad1.x){
@@ -97,33 +103,34 @@ public class CompetitionTeleOp extends LinearOpMode {
             } else {
                 spool.raise();
             }
-
+            shooter.flywheel.setTargetVelocity(RotationsPerMinute.of(shooterVelocity));
             hood.max();
 
-            //if (gamepad1.a){
-            //    rail.pollen();
-            //    shooter.using = shooter.pollenVelocity;
-            //}
-            //if (gamepad1.b){
-            //    rail.nectar();
-            //    shooter.using = shooter.nectarVelocity;
-            //}
+            if (gamepad1.a){
+                rail.pollen();
+                shooter.using = shooter.pollenVelocity;
+            }
+            if (gamepad1.b){
+                rail.nectar();
+                shooter.using = shooter.nectarVelocity;
+            }
             //rail.pollen();
 
             if (gamepad1.left_bumper) {
                 intake.setPower(-0.5);
                 transfer.reject();
-                shooter.rollers.setPower(0.0);
+                shooter.rollers.setTargetVelocity(RotationsPerMinute.of(0.0));
             }
             else if (gamepad1.right_trigger > 0.5 && Math.abs(shooter.flywheel.getCurrentVelocity().into(RotationsPerMinute) - shooter.flywheel.getCurrentTargetVelocity().into(RotationsPerMinute)) < 280) {
                     transfer.transfer();
                     intake.setPower(1);
-                    shooter.rollers.setPower(Throttle.of(1).into(AppliedThrottle));
+                    shooter.rollers.setTargetVelocity(RotationsPerMinute.of(rail.getIsPollen() ?
+                            CounterrollerSubsystem.pollenRPM : CounterrollerSubsystem.nectarRPM));
             }
             else {
                     intake.on();
                     transfer.off();
-                    shooter.rollers.setPower(0.0);
+                    shooter.rollers.setTargetVelocity(RotationsPerMinute.of(0.0));
             }
             if (gamepad1.options) {
                 imu.resetYaw();
@@ -177,11 +184,11 @@ public class CompetitionTeleOp extends LinearOpMode {
             Fate.log("Util/LoopMs", loopTime.milliseconds());
             loopTime.reset();
 
-//            if (colorSensor.proximityDetected() && !colorSensor.yellowDetected()){
-//                    rail.nectar();
-//            } else {
-//                rail.pollen();
-//            }
+            //if (colorSensor.proximityDetected() && !colorSensor.yellowDetected()){
+            //        rail.nectar();
+            //} else {
+            //    rail.pollen();
+            //}
 
             shooter.flywheel.periodic();
             shooter.rollers.periodic();

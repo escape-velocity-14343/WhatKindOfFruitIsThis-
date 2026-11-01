@@ -119,12 +119,12 @@ public class ShooterSubsystem extends SubsystemBase {
     public void update(Pose2d robotPose, Telemetry telemetry) {
         this.state = calculateTargetShooterState(robotPose);
 
-//        this.rollers.setTargetVelocity(state.rollerAngVel);
-//        this.flywheel.setTargetVelocity(state.flywheelAngVel);
-//        this.hood.setAngle(state.hoodAngle);
+        //this.rollers.setTargetVelocity(state.rollerAngVel);
+        //this.flywheel.setTargetVelocity(state.flywheelAngVel);
+        //this.hood.setAngle(state.hoodAngle);
         this.turret.setDegrees(state.turretAngle.into(Degrees));
         //this.rail.set(state.element);
-        flywheel.setTargetVelocity(state.flywheelAngVel);
+        //flywheel.setTargetVelocity(state.flywheelAngVel);
 //        rollers.setPower(Throttle.of(1).into(AppliedThrottle));
         telemetry.addData("flywheel velocity", state.flywheelAngVel);
         Fate.log("Shooter/TargetState", state, shooterStateSchema);
@@ -152,11 +152,11 @@ public class ShooterSubsystem extends SubsystemBase {
                         -robotPose.getRotation().getRadians()))
                 .times(-1);
 
-        AngularVelocity flywheelVelocity = RotationsPerMinute.of(using.get(Range.clip(robotPose.getTranslation().getDistance(PositionConstants.getGoalPose().getTranslation()),35.1, 87.9)));
+        //AngularVelocity flywheelVelocity = RotationsPerMinute.of(using.get(Range.clip(robotPose.getTranslation().getDistance(PositionConstants.getGoalPose().getTranslation()),35.1, 87.9)));
 
         return new ShooterState(
-                flywheelVelocity,
-                RotationsPerMinute.of(0.0),
+                RotationsPerMinute.of(0),
+                rollers.getCurrentTargetVelocity(),
                 Degrees.of(0.0),
                 turretAngle,
                 ShooterElement.POLLEN

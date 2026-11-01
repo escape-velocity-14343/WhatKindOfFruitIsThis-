@@ -71,6 +71,7 @@ public class Auto extends LinearOpMode {
                         // preloads
                         new RaiseRampCommand(spool),
                         new RollersOnCommand(shooter),
+                        new RollersOnCommand(shooter, rail),
                         new WaitCommand(200),
                         new WaitUntilCommand(() -> shooter.flywheel.getCurrentTargetVelocity()
                                 .minus(shooter.flywheel.getCurrentVelocity())
@@ -87,7 +88,7 @@ public class Auto extends LinearOpMode {
 
                         // traverse
                         new GoToPointWithDefaultCommand(new Pose2d(-50, 48.0, Rotation2d.fromDegrees(90)), toPoint),
-                        new RollersOnCommand(shooter),
+                        new RollersOnCommand(shooter, rail),
                         new TransferOnCommand(transfer, intake),
                         new WaitCommand(1000),
                         new RollersOffCommand(shooter),
@@ -100,7 +101,7 @@ public class Auto extends LinearOpMode {
                                 .withTimeout(2000),
 
                         // flower shoot
-                        new RollersOnCommand(shooter),
+                        new RollersOnCommand(shooter, rail),
                         new GoToPointWithDefaultCommand(new Pose2d(-40, 40.0, Rotation2d.fromDegrees(180)), toPoint, 3.0, 10.0),
                         new TransferOnCommand(transfer, intake),
                         new WaitCommand(1000),
