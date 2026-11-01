@@ -72,28 +72,24 @@ public class Auto extends LinearOpMode {
                 new SequentialCommandGroup(
                         // preloads
                         new RaiseRampCommand(spool),
-                        new RollersOnCommand(shooter, rail),
-                        new WaitCommand(200),
-                        new WaitUntilCommand(() -> shooter.flywheel.getCurrentTargetVelocity()
-                                .minus(shooter.flywheel.getCurrentVelocity())
-                                .isNear(RotationsPerMinute.of(0.0), RotationsPerMinute.of(180.0))),
-                        new TransferOnCommand(transfer, intake),
+                        new RollersOnCommand(shooter),
+                        new SmartTransferCommand(shooter, transfer, intake, 2000),
                         new WaitCommand(1000),
                         new RollersOffCommand(shooter),
                         new TransferOffCommand(transfer, intake),
                         new InstantCommand(() -> PositionConstants.rightGoalIsUp = false),
+                        new InstantCommand(() -> toPoint.maxTranslationPower = 0.4),
 
                         // garden
                         new GoToPointWithDefaultCommand(new Pose2d(-70.8, -66.4, Rotation2d.fromDegrees(180)), toPoint, 3.0, 10.0)
                                 .withTimeout(2000),
+                        new InstantCommand(() -> toPoint.maxTranslationPower = 1.0),
 
                         // traverse
-                        new GoToPointWithDefaultCommand(new Pose2d(-50, 48.0, Rotation2d.fromDegrees(90)), toPoint),
-                        new RollersOnCommand(shooter, rail),
-                        new TransferOnCommand(transfer, intake),
-                        new WaitCommand(1000),
+                        new GoToPointWithDefaultCommand(new Pose2d(-45, 48.0, Rotation2d.fromDegrees(-90)), toPoint),
+                        new RollersOnCommand(shooter),
+                        new SmartTransferCommand(shooter, transfer, intake, 2000),
                         new RollersOffCommand(shooter),
-                        new TransferOffCommand(transfer, intake),
 
                         // flower intake
                         new GoToPointWithDefaultCommand(new Pose2d(-24, 48.0, Rotation2d.fromDegrees(90)), toPoint, 3.0, 5.0),
@@ -102,11 +98,9 @@ public class Auto extends LinearOpMode {
                                 .withTimeout(2000),
 
                         // flower shoot
-                        new RollersOnCommand(shooter, rail),
-                        new GoToPointWithDefaultCommand(new Pose2d(-40, 40.0, Rotation2d.fromDegrees(180)), toPoint, 3.0, 10.0),
-                        new TransferOnCommand(transfer, intake),
-                        new WaitCommand(1000),
-                        new TransferOffCommand(transfer, intake),
+                        new RollersOnCommand(shooter),
+                        new GoToPointWithDefaultCommand(new Pose2d(-40, 40.0, Rotation2d.fromDegrees(-90)), toPoint, 3.0, 10.0),
+                        new SmartTransferCommand(shooter, transfer, intake, 2000),
                         new RollersOffCommand(shooter),
                         new RaiseRampCommand(spool),
 

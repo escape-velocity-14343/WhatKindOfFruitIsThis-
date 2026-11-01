@@ -8,8 +8,8 @@ import static gay.zharel.fastlane.UnitsKt.*;
 
 public class RollersOnCommand extends InstantCommand {
 
-    public RollersOnCommand(ShooterSubsystem shooter, RailSubsystem2 rail) {
-        super(() -> shooter.rollers.setTargetVelocity(CounterrollerSubsystem.getTargetRPMByElement(rail.getIsPollen())), shooter.rollers);
+    public RollersOnCommand(ShooterSubsystem shooter) {
+        super(() -> shooter.isUsingRollers = true);
     }
 
 }

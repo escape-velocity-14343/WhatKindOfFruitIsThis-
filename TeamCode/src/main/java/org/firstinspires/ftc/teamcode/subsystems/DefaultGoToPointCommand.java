@@ -44,6 +44,7 @@ public class DefaultGoToPointCommand extends CommandBase {
 
     public double tol = 6.7;
     public double hTol = 6.7;
+    public double maxTranslationPower = 1.0;
 
     org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem drive;
     org.firstinspires.ftc.teamcode.subsystems.pinpoint.PinpointSubsystem pinpoint;
@@ -140,6 +141,7 @@ public class DefaultGoToPointCommand extends CommandBase {
             xPID.setPID(translationkP, translationkI, translationkD);
             magnitude = xPID.calculate(0,Math.hypot(xDist, yDist));
         }
+        magnitude = Range.clip(magnitude, -maxTranslationPower, maxTranslationPower);
         Log.v("GTPC", "Output: " + magnitude);
         double xMove = Math.cos(angle)*magnitude;
         double yMove = Math.sin(angle)*magnitude;

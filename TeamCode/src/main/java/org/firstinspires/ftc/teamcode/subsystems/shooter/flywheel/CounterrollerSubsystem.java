@@ -24,6 +24,7 @@ public class CounterrollerSubsystem extends FlywheelBaseSubsystem {
 
     public static double pollenRPM = 0.0;
     public static double nectarRPM = 0.0;
+    public static double toleranceRPM = 200.0;
     public static AngularVelocity getTargetRPMByElement(boolean isPollen) {
         return RotationsPerMinute.of(isPollen ? pollenRPM : nectarRPM);
     }

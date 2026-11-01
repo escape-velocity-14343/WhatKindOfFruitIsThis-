@@ -10,7 +10,7 @@ import static gay.zharel.fastlane.UnitsKt.Throttle;
 public class RollersOffCommand extends InstantCommand {
 
     public RollersOffCommand(ShooterSubsystem shooter) {
-        super(() -> shooter.rollers.setTargetVelocity(RotationsPerMinute.of(0.0)), shooter.rollers);
+        super(() -> shooter.isUsingRollers = false);
     }
 
 }
