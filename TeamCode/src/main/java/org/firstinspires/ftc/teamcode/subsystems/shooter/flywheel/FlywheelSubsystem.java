@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.FlywheelBaseSu
 @Config
 public class FlywheelSubsystem extends FlywheelBaseSubsystem {
     public static FlywheelConfiguration config = new FlywheelConfiguration(
-            0.009,
+            0.0112,
             0.05,
             0.001,
             0.0,

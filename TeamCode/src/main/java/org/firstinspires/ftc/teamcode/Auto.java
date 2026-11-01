@@ -44,6 +44,8 @@ public class Auto extends LinearOpMode {
         IntakeSubsystem intake = new IntakeSubsystem(hardwareMap);
         ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap);
         RailSubsystem2 rail = new RailSubsystem2(hardwareMap);
+        shooter.setPollenSupplier(rail::getIsPollen);
+
         TransferSubsystem transfer = new TransferSubsystem(hardwareMap, rail::getIsPollen);
         PinpointSubsystem pinpoint = new PinpointSubsystem(hardwareMap);
         RampSpoolSubsystem spool = new RampSpoolSubsystem(hardwareMap);
@@ -70,7 +72,6 @@ public class Auto extends LinearOpMode {
                 new SequentialCommandGroup(
                         // preloads
                         new RaiseRampCommand(spool),
-                        new RollersOnCommand(shooter),
                         new RollersOnCommand(shooter, rail),
                         new WaitCommand(200),
                         new WaitUntilCommand(() -> shooter.flywheel.getCurrentTargetVelocity()

@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.function.BooleanSupplier;
 
 import static dev.nextftc.units.Units.*;
 import static gay.zharel.fastlane.UnitsKt.AppliedThrottle;
@@ -39,8 +40,19 @@ public class ShooterSubsystem extends SubsystemBase {
     private static final Logger log = LoggerFactory.getLogger(ShooterSubsystem.class);
     public InterpLUT pollenVelocity = new InterpLUT();
     public InterpLUT nectarVelocity = new InterpLUT();
-    public boolean shootingPollen = true;
-    public InterpLUT using = pollenVelocity;
+    public InterpLUT pollenRollerVelocity = new InterpLUT();
+    public InterpLUT nectarRollerVelocity = new InterpLUT();
+    //public boolean shootingPollen = true;
+    public boolean isUsingRollers = false;
+    public BooleanSupplier isPollen = () -> true;
+
+    public InterpLUT getFlywheelUsing() {
+        return isPollen.getAsBoolean() ? pollenVelocity : nectarVelocity;
+    }
+
+    public InterpLUT getRollerUsing() {
+        return isPollen.getAsBoolean() ? pollenRollerVelocity : nectarRollerVelocity;
+    }
     /**
      * which thing are we shooting
      */
@@ -83,6 +95,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public HoodSubsystem hood;
     //public RailSubsystem rail;
     public TurretSubsystem turret;
+    public boolean useCounterrollers = false;
     public ShooterState state = new ShooterState(
             RotationsPerMinute.of(0.0),
             RotationsPerMinute.of(0.0),
@@ -90,27 +103,49 @@ public class ShooterSubsystem extends SubsystemBase {
             Degrees.of(0.0),
             ShooterElement.POLLEN
     );
+    public AngularVelocity rollerPotentialVelocity = RotationsPerMinute.of(0.0);
     public ShooterSubsystem(HardwareMap hardwareMap) {
-        pollenVelocity.add(35, -2200);
-        pollenVelocity.add(40, -2050);
-        pollenVelocity.add(45, -2300);
-        pollenVelocity.add(60, -2400);
-        pollenVelocity.add(75, -2700);
-        pollenVelocity.add(88, -2900);
+        pollenVelocity.add(37.3, -2800);
+        pollenVelocity.add(45.7, -2800);
+        pollenVelocity.add(53, -2550);
+        pollenVelocity.add(58, -2600);
+        pollenVelocity.add(68, -2800);
         pollenVelocity.createLUT();
 
-        nectarVelocity.add(35, -2900);
-        nectarVelocity.add(45, -3050);
-        nectarVelocity.add(60, -3600);
-        nectarVelocity.add(75, -3700);
-        nectarVelocity.add(86, -3900);
+        pollenRollerVelocity.add(37.3, -4300);
+        pollenRollerVelocity.add(45.7, -4300);
+        pollenRollerVelocity.add(53, -4700);
+        pollenRollerVelocity.add(58, -4700);
+        pollenRollerVelocity.add(68, -4700);
+        pollenRollerVelocity.createLUT();
+
+        nectarVelocity.add(37.3, -2800);
+        nectarVelocity.add(46.6, -2800);
+        nectarVelocity.add(54, -3000);
+        nectarVelocity.add(60.3, -3025);
+        nectarVelocity.add(68, -3100);
+        //nectarVelocity.add(46.6, -2900);
+        //nectarVelocity.add(54, -3100);
+        //nectarVelocity.add(60.3, -3200);
+        //nectarVelocity.add(68, -3300);
         nectarVelocity.createLUT();
+
+        nectarRollerVelocity.add(37.3, -4700);
+        nectarRollerVelocity.add(46.6, -4700);
+        nectarRollerVelocity.add(54, -4700);
+        nectarRollerVelocity.add(60.3, -4900);
+        nectarRollerVelocity.add(68, -4900);
+        nectarRollerVelocity.createLUT();
 
         this.rollers = new CounterrollerSubsystem(hardwareMap);
         this.flywheel = new FlywheelSubsystem(hardwareMap);
         this.hood = new HoodSubsystem(hardwareMap);
         //this.rail = new RailSubsystem(hardwareMap);
         this.turret = new TurretSubsystem(hardwareMap);
+    }
+
+    public void setPollenSupplier(BooleanSupplier isPollen) {
+        this.isPollen = isPollen;
     }
 
     /**
@@ -124,8 +159,8 @@ public class ShooterSubsystem extends SubsystemBase {
         //this.hood.setAngle(state.hoodAngle);
         this.turret.setDegrees(state.turretAngle.into(Degrees));
         //this.rail.set(state.element);
-        //flywheel.setTargetVelocity(state.flywheelAngVel);
-//        rollers.setPower(Throttle.of(1).into(AppliedThrottle));
+        flywheel.setTargetVelocity(state.flywheelAngVel);
+        rollers.setTargetVelocity(state.rollerAngVel);
         telemetry.addData("flywheel velocity", state.flywheelAngVel);
         Fate.log("Shooter/TargetState", state, shooterStateSchema);
         Fate.log("Shooter/CurrentState", new ShooterState(
@@ -152,11 +187,14 @@ public class ShooterSubsystem extends SubsystemBase {
                         -robotPose.getRotation().getRadians()))
                 .times(-1);
 
-        //AngularVelocity flywheelVelocity = RotationsPerMinute.of(using.get(Range.clip(robotPose.getTranslation().getDistance(PositionConstants.getGoalPose().getTranslation()),35.1, 87.9)));
+        AngularVelocity flywheelVelocity = RotationsPerMinute.of(getFlywheelUsing().get(Range.clip(robotPose.getTranslation().getDistance(PositionConstants.getGoalPose().getTranslation()),37.4, 67.9)));
+        AngularVelocity rollerVelocity = RotationsPerMinute.of(getRollerUsing().get(Range.clip(robotPose.getTranslation().getDistance(PositionConstants.getGoalPose().getTranslation()),37.4, 67.9)));
+
+        rollerPotentialVelocity = rollerVelocity;
 
         return new ShooterState(
-                RotationsPerMinute.of(0),
-                rollers.getCurrentTargetVelocity(),
+                flywheelVelocity,
+                isUsingRollers ? rollerVelocity : RotationsPerMinute.of(0.0),
                 Degrees.of(0.0),
                 turretAngle,
                 ShooterElement.POLLEN

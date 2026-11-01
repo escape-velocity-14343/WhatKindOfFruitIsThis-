@@ -11,8 +11,8 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 public class RampSpoolSubsystem extends SubsystemBase {
     private Servo spoolServo;
 
-    public static double raisedPos = 0.25;
-    public static double loweredPos = 0.6;
+    public static double raisedPos = 0;
+    public static double loweredPos = 0.35;
 
     public enum RampState {
         RAISED,

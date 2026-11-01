@@ -33,6 +33,7 @@ import org.firstinspires.ftc.teamcode.subsystems.shooter.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.hood.HoodSubsystem2;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.rail.RailSubsystem2;
 
+import static dev.nextftc.units.Units.getDegreesPerSecond;
 import static gay.zharel.fastlane.UnitsKt.*;
 
 import java.util.List;
@@ -43,6 +44,7 @@ import java.util.List;
 public class CompetitionTeleOp extends LinearOpMode {
     public static int shooterVelocity = -5000;
     public static double rollerThrottle = 1.0;
+    boolean isDown = false;
     //public static double flywheelVelocity
 
     @Override
@@ -58,6 +60,7 @@ public class CompetitionTeleOp extends LinearOpMode {
         IntakeSubsystem intake = new IntakeSubsystem(hardwareMap);
         TransferSubsystem transfer = new TransferSubsystem(hardwareMap, rail::getIsPollen);
         ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap);
+        shooter.setPollenSupplier(rail::getIsPollen);
         PinpointSubsystem pinpoint = new PinpointSubsystem(hardwareMap);
         RampSpoolSubsystem spool = new RampSpoolSubsystem(hardwareMap);
         ColorSensorSubsystem colorSensor = new ColorSensorSubsystem(hardwareMap);
@@ -68,7 +71,7 @@ public class CompetitionTeleOp extends LinearOpMode {
         imu.initialize(params);
 
         //pinpoint.reset(); // QWC
-
+        //spool.raise();
         rail.pollen();
         boolean lastA = false;
         CommandScheduler.getInstance().cancelAll();
@@ -88,7 +91,7 @@ public class CompetitionTeleOp extends LinearOpMode {
             //telemetry.addData("Turret Angle", turretAngle);
             telemetry.addData("Shooter RPM", shooter.flywheel.getCurrentVelocity()
                     .into(RotationsPerMinute));
-            telemetry.addData("Shooter Target RPM", shooterVelocity);
+            telemetry.addData("Shooter Target RPM", shooter.flywheel.getCurrentTargetVelocity().into(RotationsPerMinute));
             telemetry.addData("Counter roller RPM", shooter.rollers.getCurrentVelocity().into(RotationsPerMinute));
             telemetry.addData("Counter roller Target RPM", shooter.rollers.getCurrentTargetVelocity().into(RotationsPerMinute));
             pinpoint.periodic();
@@ -98,39 +101,44 @@ public class CompetitionTeleOp extends LinearOpMode {
             //}
             //if(gamepad1.y){hood.min();}
 
-            if (gamepad1.right_bumper){
-                spool.lower();
-            } else {
-                spool.raise();
+            if (gamepad1.rightBumperWasReleased()){
+                if (isDown){
+                    spool.raise();
+                } else {
+                    spool.lower();
+                }
+                isDown = !isDown;
             }
-            shooter.flywheel.setTargetVelocity(RotationsPerMinute.of(shooterVelocity));
+            //shooter.flywheel.setTargetVelocity(RotationsPerMinute.of(shooterVelocity));
             hood.max();
 
             if (gamepad1.a){
                 rail.pollen();
-                shooter.using = shooter.pollenVelocity;
             }
             if (gamepad1.b){
                 rail.nectar();
-                shooter.using = shooter.nectarVelocity;
             }
             //rail.pollen();
 
             if (gamepad1.left_bumper) {
                 intake.setPower(-0.5);
                 transfer.reject();
-                shooter.rollers.setTargetVelocity(RotationsPerMinute.of(0.0));
+                shooter.isUsingRollers = false;
             }
             else if (gamepad1.right_trigger > 0.5 && Math.abs(shooter.flywheel.getCurrentVelocity().into(RotationsPerMinute) - shooter.flywheel.getCurrentTargetVelocity().into(RotationsPerMinute)) < 280) {
+                intake.setPower(1);
+                //shooter.rollers.setTargetVelocity(RotationsPerMinute.of(CounterrollerSubsystem.pollenRPM));
+                shooter.isUsingRollers = true;
+                if (shooter.rollerPotentialVelocity.into(RotationsPerMinute) + 100 > shooter.rollers.getCurrentVelocity().into(RotationsPerMinute) && shooter.rollerPotentialVelocity.into(RotationsPerMinute) - 100 < shooter.rollers.getCurrentVelocity().into(RotationsPerMinute)){
                     transfer.transfer();
-                    intake.setPower(1);
-                    shooter.rollers.setTargetVelocity(RotationsPerMinute.of(rail.getIsPollen() ?
-                            CounterrollerSubsystem.pollenRPM : CounterrollerSubsystem.nectarRPM));
+                } else {
+                    transfer.off();
+                }
             }
             else {
-                    intake.on();
-                    transfer.off();
-                    shooter.rollers.setTargetVelocity(RotationsPerMinute.of(0.0));
+                intake.on();
+                transfer.off();
+                shooter.isUsingRollers = false;
             }
             if (gamepad1.options) {
                 imu.resetYaw();
