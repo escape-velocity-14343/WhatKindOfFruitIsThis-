@@ -128,15 +128,18 @@ public class CompetitionTeleOp extends LinearOpMode {
                 transfer.reject();
                 shooter.isUsingRollers = false;
             }
-            else if (gamepad1.right_trigger > 0.5 && Math.abs(shooter.flywheel.getCurrentVelocity().into(RotationsPerMinute) - shooter.flywheel.getCurrentTargetVelocity().into(RotationsPerMinute)) < 280) {
+            else if (gamepad1.right_trigger > 0.5) {
                 intake.setPower(1);
                 //shooter.rollers.setTargetVelocity(RotationsPerMinute.of(CounterrollerSubsystem.pollenRPM));
                 shooter.isUsingRollers = true;
-                if (shooter.rollerPotentialVelocity.into(RotationsPerMinute) + 100 > shooter.rollers.getCurrentVelocity().into(RotationsPerMinute) && shooter.rollerPotentialVelocity.into(RotationsPerMinute) - 100 < shooter.rollers.getCurrentVelocity().into(RotationsPerMinute)){
+                shooter.update(pinpoint.getPose(), telemetry);
+                if (Math.abs(shooter.flywheel.getCurrentVelocity().into(RotationsPerMinute) - shooter.flywheel.getCurrentTargetVelocity().into(RotationsPerMinute)) < 280
+                && shooter.rollerPotentialVelocity.into(RotationsPerMinute) + 100 > shooter.rollers.getCurrentVelocity().into(RotationsPerMinute) && shooter.rollerPotentialVelocity.into(RotationsPerMinute) - 100 < shooter.rollers.getCurrentVelocity().into(RotationsPerMinute)){
                     transfer.transfer();
-                } else {
-                    transfer.off();
                 }
+//                else {
+//                    transfer.off();
+//                }
             }
             else if (gamepad1.left_trigger > 0.5){
                 intake.setPower(1);
