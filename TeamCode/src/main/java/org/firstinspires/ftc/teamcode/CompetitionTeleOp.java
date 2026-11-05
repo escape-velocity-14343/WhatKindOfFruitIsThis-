@@ -104,6 +104,10 @@ public class CompetitionTeleOp extends LinearOpMode {
             //}
             //if(gamepad1.y){hood.min();}
 
+            PositionConstants.goalXOffset = (pinpoint.getVelocity().getX() * .6) + (1.5 * pinpoint.getVelocity().getRotation().getRadians() * Math.sin(pinpoint.getHeading().getRadians()) * 0.6);
+            PositionConstants.goalY = (pinpoint.getVelocity().getY() * .6) - (1.5 * pinpoint.getVelocity().getRotation().getRadians() * Math.cos(pinpoint.getHeading().getRadians()) * 0.6);
+
+
             if (gamepad1.rightBumperWasReleased()){
                 if (isDown){
                     spool.raise();
@@ -115,12 +119,25 @@ public class CompetitionTeleOp extends LinearOpMode {
             //shooter.flywheel.setTargetVelocity(RotationsPerMinute.of(shooterVelocity));
             hood.max();
 
-            if (gamepad2.a || gamepad1.a){
-                rail.pollen();
+            //if (gamepad2.a || gamepad1.a){
+            //    rail.pollen();
+            //}
+            //if (gamepad2.b || gamepad1.b){
+            //    rail.nectar();
+            //}
+
+            if (colorSensor.proximityDetected()){
+                telemetry.addLine("proximity detected");
+                telemetry.addData("hue is:", colorSensor.getHsv());
+                if (colorSensor.yellowDetected()){
+                    telemetry.addLine("yellow detected");
+                    rail.pollen();
+                } else {
+                    telemetry.addLine("yellow not detected");
+                    rail.nectar();
+                }
             }
-            if (gamepad2.b || gamepad1.b){
-                rail.nectar();
-            }
+
             //rail.pollen();
 
             if (gamepad1.left_bumper) {

@@ -19,10 +19,16 @@ public class ColorSensorSubsystem extends SubsystemBase {
         return ballSensor.getDistance(DistanceUnit.CM) < proximityThreshold;
     }
 
+    public float getHsv(){
+        float[] hsv = new float[3];
+        android.graphics.Color.RGBToHSV(ballSensor.red(), ballSensor.green(), ballSensor.blue(), hsv);
+        return hsv[0];
+    }
+
     public boolean yellowDetected(){
         float[] hsv = new float[3];
         android.graphics.Color.RGBToHSV(ballSensor.red(), ballSensor.green(), ballSensor.blue(), hsv);
-        return 20 < hsv[0] && hsv[0] > 30;
+        return 80 < hsv[0] && hsv[0] < 100;
     }
 
     //@Override
