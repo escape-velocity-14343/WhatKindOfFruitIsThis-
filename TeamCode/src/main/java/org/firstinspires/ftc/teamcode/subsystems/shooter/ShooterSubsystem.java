@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.shooter;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
@@ -19,6 +20,7 @@ import gay.zharel.fateweaver.telemetry.Fate;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.subsystems.PositionConstants;
+import org.firstinspires.ftc.teamcode.subsystems.lib.TunableInterpLUT;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.CounterrollerSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.FlywheelSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.hood.HoodSubsystem;
@@ -27,30 +29,85 @@ import org.firstinspires.ftc.teamcode.subsystems.shooter.turret.TurretSubsystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.BooleanSupplier;
+import java.util.stream.Collectors;
 
 import static dev.nextftc.units.Units.*;
 import static gay.zharel.fastlane.UnitsKt.AppliedThrottle;
 import static gay.zharel.fastlane.UnitsKt.Throttle;
+import static java.lang.Math.min;
 
+@Config
 // ok hello basically this one does all the aiming calculations and the other
 // smaller ones do all the everything else ok thank you bye
 public class ShooterSubsystem extends SubsystemBase {
     private static final Logger log = LoggerFactory.getLogger(ShooterSubsystem.class);
-    public InterpLUT pollenVelocity = new InterpLUT();
-    public InterpLUT nectarVelocity = new InterpLUT();
-    public InterpLUT pollenRollerVelocity = new InterpLUT();
-    public InterpLUT nectarRollerVelocity = new InterpLUT();
+
+    public static double[] pollenDistances = new double[]{
+            37.3,
+            45.7,
+            53.0,
+            58.0,
+            68.0
+    };
+
+    public static double[] pollenFlywheelRpms = new double[]{
+            -2500.0,
+            -2500.0,
+            -2300.0,
+            -2400.0,
+            -2500.0
+    };
+
+    public static double[] pollenRollerRpms = new double[]{
+            -4000.0,
+            -4000.0,
+            -4700.0,
+            -4700.0,
+            -4700.0
+    };
+
+    public static double[] nectarDistances = new double[]{
+            37.3,
+            45.7,
+            53.0,
+            58.0,
+            68.0
+    };
+
+    public static double[] nectarFlywheelRpms = new double[]{
+            -2800.0,
+            -2800.0,
+            -3000.0,
+            -3025.0,
+            -3100.0
+    };
+
+    public static double[] nectarRollerRpms = new double[]{
+            -4700.0,
+            -4700.0,
+            -4700.0,
+            -4900.0,
+            -4900.0
+    };
+
+    public TunableInterpLUT pollenVelocity = new TunableInterpLUT();
+    public TunableInterpLUT nectarVelocity = new TunableInterpLUT();
+    public TunableInterpLUT pollenRollerVelocity = new TunableInterpLUT();
+    public TunableInterpLUT nectarRollerVelocity = new TunableInterpLUT();
     //public boolean shootingPollen = true;
     public boolean isUsingRollers = false;
     public BooleanSupplier isPollen = () -> true;
 
-    public InterpLUT getFlywheelUsing() {
+    public TunableInterpLUT getFlywheelUsing() {
         return isPollen.getAsBoolean() ? pollenVelocity : nectarVelocity;
     }
 
-    public InterpLUT getRollerUsing() {
+    public TunableInterpLUT getRollerUsing() {
         return isPollen.getAsBoolean() ? pollenRollerVelocity : nectarRollerVelocity;
     }
     /**
@@ -105,36 +162,20 @@ public class ShooterSubsystem extends SubsystemBase {
     );
     public AngularVelocity rollerPotentialVelocity = RotationsPerMinute.of(0.0);
     public ShooterSubsystem(HardwareMap hardwareMap) {
-        pollenVelocity.add(37.3, -2800);
-        pollenVelocity.add(45.7, -2800);
-        pollenVelocity.add(53, -2550);
-        pollenVelocity.add(58, -2700);
-        pollenVelocity.add(68, -2800);
+        pollenVelocity.mX = Arrays.stream(pollenDistances).boxed().collect(Collectors.toList());
+        pollenVelocity.mY = Arrays.stream(pollenFlywheelRpms).boxed().collect(Collectors.toList());
         pollenVelocity.createLUT();
 
-        pollenRollerVelocity.add(37.3, -4300);
-        pollenRollerVelocity.add(45.7, -4300);
-        pollenRollerVelocity.add(53, -4700);
-        pollenRollerVelocity.add(58, -4700);
-        pollenRollerVelocity.add(68, -4700);
+        pollenRollerVelocity.mX = Arrays.stream(pollenDistances).boxed().collect(Collectors.toList());
+        pollenRollerVelocity.mY = Arrays.stream(pollenRollerRpms).boxed().collect(Collectors.toList());
         pollenRollerVelocity.createLUT();
 
-        nectarVelocity.add(37.3, -2800);
-        nectarVelocity.add(46.6, -2800);
-        nectarVelocity.add(54, -3000);
-        nectarVelocity.add(60.3, -3025);
-        nectarVelocity.add(68, -3100);
-        //nectarVelocity.add(46.6, -2900);
-        //nectarVelocity.add(54, -3100);
-        //nectarVelocity.add(60.3, -3200);
-        //nectarVelocity.add(68, -3300);
+        nectarVelocity.mX = Arrays.stream(nectarDistances).boxed().collect(Collectors.toList());
+        nectarVelocity.mY = Arrays.stream(nectarFlywheelRpms).boxed().collect(Collectors.toList());
         nectarVelocity.createLUT();
 
-        nectarRollerVelocity.add(37.3, -4700);
-        nectarRollerVelocity.add(46.6, -4700);
-        nectarRollerVelocity.add(54, -4700);
-        nectarRollerVelocity.add(60.3, -4900);
-        nectarRollerVelocity.add(68, -4900);
+        nectarRollerVelocity.mX = Arrays.stream(nectarDistances).boxed().collect(Collectors.toList());
+        nectarRollerVelocity.mY = Arrays.stream(nectarRollerRpms).boxed().collect(Collectors.toList());
         nectarRollerVelocity.createLUT();
 
         this.rollers = new CounterrollerSubsystem(hardwareMap);
@@ -152,6 +193,24 @@ public class ShooterSubsystem extends SubsystemBase {
      * implement when we start actually aiming! sets all the targets that we want
      */
     public void update(Pose2d robotPose, Telemetry telemetry) {
+
+        // update luts
+        pollenVelocity.mX = Arrays.stream(pollenDistances).boxed().collect(Collectors.toList());
+        pollenVelocity.mY = Arrays.stream(pollenFlywheelRpms).boxed().collect(Collectors.toList());
+        pollenVelocity.createLUT();
+
+        pollenRollerVelocity.mX = Arrays.stream(pollenDistances).boxed().collect(Collectors.toList());
+        pollenRollerVelocity.mY = Arrays.stream(pollenRollerRpms).boxed().collect(Collectors.toList());
+        pollenRollerVelocity.createLUT();
+
+        nectarVelocity.mX = Arrays.stream(nectarDistances).boxed().collect(Collectors.toList());
+        nectarVelocity.mY = Arrays.stream(nectarFlywheelRpms).boxed().collect(Collectors.toList());
+        nectarVelocity.createLUT();
+
+        nectarRollerVelocity.mX = Arrays.stream(nectarDistances).boxed().collect(Collectors.toList());
+        nectarRollerVelocity.mY = Arrays.stream(nectarRollerRpms).boxed().collect(Collectors.toList());
+        nectarRollerVelocity.createLUT();
+
         this.state = calculateTargetShooterState(robotPose);
 
         //this.rollers.setTargetVelocity(state.rollerAngVel);
@@ -188,8 +247,12 @@ public class ShooterSubsystem extends SubsystemBase {
                         -robotPose.getRotation().getRadians()))
                 .times(-1);
 
-        AngularVelocity flywheelVelocity = RotationsPerMinute.of(getFlywheelUsing().get(Range.clip(robotPose.getTranslation().getDistance(PositionConstants.getGoalPose().getTranslation()),37.4, 67.9)));
-        AngularVelocity rollerVelocity = RotationsPerMinute.of(getRollerUsing().get(Range.clip(robotPose.getTranslation().getDistance(PositionConstants.getGoalPose().getTranslation()),37.4, 67.9)));
+        AngularVelocity flywheelVelocity = RotationsPerMinute.of(getFlywheelUsing().get(Range.clip(robotPose.getTranslation().getDistance(PositionConstants.getGoalPose().getTranslation())
+                ,min(pollenDistances[0], nectarDistances[0]) + 0.1,
+                Math.max(pollenDistances[pollenDistances.length - 1], nectarDistances[nectarDistances.length - 1]) - 0.1)));
+        AngularVelocity rollerVelocity = RotationsPerMinute.of(getRollerUsing().get(Range.clip(robotPose.getTranslation().getDistance(PositionConstants.getGoalPose().getTranslation()),
+                min(pollenDistances[0], nectarDistances[0]) + 0.1,
+                Math.max(pollenDistances[pollenDistances.length - 1], nectarDistances[nectarDistances.length - 1]) - 0.1)));
 
         rollerPotentialVelocity = rollerVelocity;
 
