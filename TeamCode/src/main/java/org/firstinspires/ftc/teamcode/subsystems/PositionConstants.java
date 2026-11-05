@@ -28,7 +28,7 @@ public class PositionConstants {
     public static boolean rightGoalIsUp = true;
 
     public static Pose2d getGoalPose() {
-        return rightGoalIsUp ? new Pose2d(goalX - goalXOffset, -goalY + goalYOffset, new Rotation2d()) : new Pose2d(goalX - goalXOffset, goalY + goalYOffset, new Rotation2d());
+        return rightGoalIsUp ? new Pose2d(goalX - goalXOffset, -goalY - goalYOffset, new Rotation2d()) : new Pose2d(goalX - goalXOffset, goalY - goalYOffset, new Rotation2d());
     }
 
     /**

@@ -105,7 +105,7 @@ public class CompetitionTeleOp extends LinearOpMode {
             //if(gamepad1.y){hood.min();}
 
             PositionConstants.goalXOffset = (pinpoint.getVelocity().getX() * .6) + (1.5 * pinpoint.getVelocity().getRotation().getRadians() * Math.sin(pinpoint.getHeading().getRadians()) * 0.6);
-            PositionConstants.goalY = (pinpoint.getVelocity().getY() * .6) - (1.5 * pinpoint.getVelocity().getRotation().getRadians() * Math.cos(pinpoint.getHeading().getRadians()) * 0.6);
+            PositionConstants.goalYOffset = (pinpoint.getVelocity().getY() * .6) - (1.5 * pinpoint.getVelocity().getRotation().getRadians() * Math.cos(pinpoint.getHeading().getRadians()) * 0.6);
 
 
             if (gamepad1.rightBumperWasReleased()){
