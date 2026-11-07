@@ -62,6 +62,13 @@ public class ColorBlobLocatorProcessorMulti extends ColorBlobLocatorProcessor im
 
     private Circle circle = new Circle(0, 0, 0);
     ElapsedTime timer = new ElapsedTime();
+    private final ElapsedTime totalTimer = new ElapsedTime();
+    private volatile double lastProcessMillis = 0;
+    private volatile double lastColorConvertMillis = 0;
+    private volatile double lastInMaskMillis = 0;
+    private volatile double lastFindContoursMillis = 0;
+    private volatile double lastFilterMillis = 0;
+    private volatile double lastSortMillis = 0;
 
     private AtomicReference<Bitmap> lastFrame = new AtomicReference<>(createBitmap(1, 1, Bitmap.Config.RGB_565));
 
@@ -114,14 +121,17 @@ public class ColorBlobLocatorProcessorMulti extends ColorBlobLocatorProcessor im
 
     @Override
     public Object processFrame(Mat frame, long captureTimeNanos) {
+        totalTimer.reset();
         Bitmap b = createBitmap(frame.width(), frame.height(), Bitmap.Config.RGB_565);
         Utils.matToBitmap(frame, b);
         lastFrame.set(b);
 
         roiMat_userColorSpace = frame.clone();
-        //timer.reset();
+        timer.reset();
         Imgproc.cvtColor(roiMat_userColorSpace, roiMat_userColorSpace, Imgproc.COLOR_RGB2HSV);
+        lastColorConvertMillis = timer.milliseconds();
         //Log.i("cv test", "time to convert color: " + timer.milliseconds());
+        timer.reset();
         if (colors.isEmpty())
             Core.inRange(roiMat_userColorSpace, colorRange.min, colorRange.max, mask);
         else {
@@ -138,12 +148,13 @@ public class ColorBlobLocatorProcessorMulti extends ColorBlobLocatorProcessor im
                 }
             }
         }
-
+        lastInMaskMillis = timer.milliseconds();
 
         ArrayList<MatOfPoint> contours = new ArrayList<>();
         Mat hierarchy = new Mat();
         timer.reset();
         Imgproc.findContours(mask, contours, hierarchy, contourCode, Imgproc.RETR_LIST);
+        lastFindContoursMillis = timer.milliseconds();
         //Log.i("cv test", "time to find contours: " + timer.milliseconds());
         hierarchy.release();
 
@@ -172,6 +183,7 @@ public class ColorBlobLocatorProcessorMulti extends ColorBlobLocatorProcessor im
                 }
             }
         }
+        lastFilterMillis = timer.milliseconds();
         //Log.i("cv test", "time to filter contours: " + timer.milliseconds());
         timer.reset();
         // Apply sorting.
@@ -196,8 +208,10 @@ public class ColorBlobLocatorProcessorMulti extends ColorBlobLocatorProcessor im
             // Apply a default sort by area
             Util.sortByArea(SortOrder.DESCENDING, blobs);
         }
+        lastSortMillis = timer.milliseconds();
         //Log.i("cv test", "time to sort contours: " + timer.milliseconds());
 
+        lastProcessMillis = totalTimer.milliseconds();
         // Deep copy this to prevent concurrent modification exception
         userBlobs = new ArrayList<>(blobs);
         timer.reset();
@@ -444,5 +458,36 @@ public class ColorBlobLocatorProcessorMulti extends ColorBlobLocatorProcessor im
     }
     public Circle getCircle() {
         return circle;
+    }
+
+    /** Milliseconds spent inside processFrame for the most recent frame. */
+    public double getLastProcessMillis()
+    {
+        return lastProcessMillis;
+    }
+
+    public double getLastColorConvertMillis()
+    {
+        return lastColorConvertMillis;
+    }
+
+    public double getLastInMaskMillis()
+    {
+        return lastInMaskMillis;
+    }
+
+    public double getLastFindContoursMillis()
+    {
+        return lastFindContoursMillis;
+    }
+
+    public double getLastFilterMillis()
+    {
+        return lastFilterMillis;
+    }
+
+    public double getLastSortMillis()
+    {
+        return lastSortMillis;
     }
 }

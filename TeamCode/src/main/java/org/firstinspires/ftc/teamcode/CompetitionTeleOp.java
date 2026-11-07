@@ -17,6 +17,23 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import android.graphics.Color;
+import android.util.Log;
+import android.util.Size;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.vision.opencv.ColorBlobLocatorProcessor;
+import org.firstinspires.ftc.vision.opencv.ColorSpace;
+import org.firstinspires.ftc.teamcode.subsystems.lib.VisionPortal.ColorBlobLocatorProcessorMulti;
+import org.firstinspires.ftc.teamcode.subsystems.lib.VisionPortal.ColorRange;
+import org.firstinspires.ftc.teamcode.subsystems.lib.VisionPortal.ImageRegion;
+import org.opencv.core.Scalar;
+
+import java.util.concurrent.TimeUnit;
+
 import gay.zharel.fateweaver.telemetry.Fate;
 
 import org.firstinspires.ftc.teamcode.subsystems.ColorSensorSubsystem;
@@ -46,6 +63,27 @@ public class CompetitionTeleOp extends LinearOpMode {
     public static int shooterVelocity = -5000;
     public static double rollerThrottle = 1.0;
     boolean isDown = false;
+
+    // ---- Vision (ported from VisionTest) ----
+    public static boolean visionEnabled = true;
+    public static boolean enableLiveView = false;
+
+    public static int SHOOTER_EXPOSURE_US = 10000;
+    public static int INTAKE_EXPOSURE_US = 10000;
+    public static long VISION_EXPOSURE_TIMEOUT_MS = 10000;
+    public static long VISION_STREAM_TIMEOUT_MS = 10000;
+    public static int VISION_EXPOSURE_MAX_ATTEMPTS = 670;
+
+    VisionPortal shooterPortal;
+    VisionPortal intakePortal;
+    VisionPortal transferPortal;
+
+    AprilTagProcessor aprilTagProcessor;
+    ColorBlobLocatorProcessorMulti intakeProcessor;
+    ColorBlobLocatorProcessorMulti transferProcessor;
+
+    boolean lastX = false;
+    boolean lastY = false;
     //public static double flywheelVelocity
 
     @Override
@@ -71,6 +109,16 @@ public class CompetitionTeleOp extends LinearOpMode {
         IMU.Parameters params = new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD, RevHubOrientationOnRobot.UsbFacingDirection.LEFT));
         IMU imu = hardwareMap.get(IMU.class, "imu");
         imu.initialize(params);
+
+        initVision();
+        if (visionEnabled) {
+            waitForStreaming(shooterPortal, VISION_STREAM_TIMEOUT_MS);
+            waitForStreaming(intakePortal, VISION_STREAM_TIMEOUT_MS);
+            waitForStreaming(transferPortal, VISION_STREAM_TIMEOUT_MS);
+            waitForSetExposure(shooterPortal, SHOOTER_EXPOSURE_US, VISION_EXPOSURE_TIMEOUT_MS, VISION_EXPOSURE_MAX_ATTEMPTS);
+            waitForSetExposure(intakePortal, INTAKE_EXPOSURE_US, VISION_EXPOSURE_TIMEOUT_MS, VISION_EXPOSURE_MAX_ATTEMPTS);
+            waitForSetExposure(transferPortal, INTAKE_EXPOSURE_US, VISION_EXPOSURE_TIMEOUT_MS, VISION_EXPOSURE_MAX_ATTEMPTS);
+        }
 
         //pinpoint.reset(); // QWC
         //spool.raise();
@@ -204,6 +252,26 @@ public class CompetitionTeleOp extends LinearOpMode {
 
             double distanceToGoal = pinpoint.getPose().getTranslation().getDistance(PositionConstants.getGoalPose().getTranslation());
 
+            // Vision toggles for loop-time testing:
+            //   dpad_up   = disable vision processing (baseline loop time)
+            //   dpad_down = re-enable vision processing
+            //   x / y     = stop / resume camera streaming
+            if (visionEnabled) {
+                if (gamepad1.dpad_up) {
+                    setEnableLiveView(false);
+                } else if (gamepad1.dpad_down) {
+                    setEnableLiveView(true);
+                }
+                if (gamepad1.x && !lastX) {
+                    stopVisionStreaming();
+                }
+                if (gamepad1.y && !lastY) {
+                    resumeVisionStreaming();
+                }
+                lastX = gamepad1.x;
+                lastY = gamepad1.y;
+            }
+
             //lastA = gamepad1.a;
             //telemetry.addData("pinpoint heading", pinpoint.getHeading().getDegrees());
             telemetry.addData("pinpointX", pinpoint.getPose().getX());
@@ -213,6 +281,7 @@ public class CompetitionTeleOp extends LinearOpMode {
             telemetry.addData("current loop ms", loopTime.milliseconds());
             telemetry.addData("running average ms", ((double)System.currentTimeMillis() - initialTime) / ((double) loops));
             telemetry.addData("distance to goal", distanceToGoal);
+            logVisionTelemetry();
             telemetry.update();
 
             shooter.update(pinpoint.getPose(), telemetry); // QWC
@@ -230,5 +299,189 @@ public class CompetitionTeleOp extends LinearOpMode {
             shooter.rollers.periodic();
 
         }
+    }
+
+    // ---------------------------------------------------------------------
+    // Vision setup / helpers (ported from VisionTest)
+    // ---------------------------------------------------------------------
+
+    private void initVision() {
+        if (!visionEnabled) {
+            return;
+        }
+        int[] viewIds = VisionPortal.makeMultiPortalView(3, VisionPortal.MultiPortalLayout.VERTICAL);
+
+        aprilTagProcessor = new AprilTagProcessor.Builder()
+                .setDrawAxes(true)
+                .setDrawCubeProjection(true)
+                .setDrawTagID(true)
+                .setDrawTagOutline(true)
+                .setNumThreads(1)
+                .build();
+        aprilTagProcessor.setDecimation(2.0f);
+
+        intakeProcessor = new ColorBlobLocatorProcessorMulti(
+                new ColorRange(ColorSpace.HSV, new Scalar(255, 255, 255), new Scalar(161, 255, 255)),
+                ImageRegion.asImageCoordinates(0, 0, 320, 240),
+                ColorBlobLocatorProcessor.ContourMode.EXTERNAL_ONLY,
+                Color.rgb(255, 120, 31),
+                Color.rgb(255, 255, 255),
+                Color.rgb(3, 227, 252)
+        );
+        intakeProcessor.addColor(new ColorRange(ColorSpace.HSV, new Scalar(50, 50, 40), new Scalar(95, 255, 255)));
+        intakeProcessor.addColor(new ColorRange(ColorSpace.HSV, new Scalar(126, 50, 50), new Scalar(161, 255, 255)));
+        intakeProcessor.addFilter(new ColorBlobLocatorProcessor.BlobFilter(ColorBlobLocatorProcessor.BlobCriteria.BY_CONTOUR_AREA, 500, 1000000));
+
+        transferProcessor = new ColorBlobLocatorProcessorMulti(
+                new ColorRange(ColorSpace.HSV, new Scalar(255, 255, 255), new Scalar(161, 255, 255)),
+                ImageRegion.asImageCoordinates(0, 0, 320, 240),
+                ColorBlobLocatorProcessor.ContourMode.EXTERNAL_ONLY,
+                Color.rgb(255, 120, 31),
+                Color.rgb(255, 255, 255),
+                Color.rgb(3, 227, 252)
+        );
+        transferProcessor.addColor(new ColorRange(ColorSpace.HSV, new Scalar(50, 50, 40), new Scalar(95, 255, 255)));
+        transferProcessor.addColor(new ColorRange(ColorSpace.HSV, new Scalar(126, 50, 50), new Scalar(161, 255, 255)));
+        transferProcessor.addFilter(new ColorBlobLocatorProcessor.BlobFilter(ColorBlobLocatorProcessor.BlobCriteria.BY_CONTOUR_AREA, 500, 1000000));
+
+        shooterPortal = new VisionPortal.Builder()
+                .setCamera(hardwareMap.get(WebcamName.class, "shooterCam"))
+                .setCameraResolution(new Size(640, 480))
+                .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
+                .enableLiveView(enableLiveView)
+                .setShowStatsOverlay(false)
+                .setLiveViewContainerId(viewIds[0])
+                .addProcessor(aprilTagProcessor)
+                .build();
+        intakePortal = new VisionPortal.Builder()
+                .addProcessors(intakeProcessor)
+                .setCameraResolution(new Size(320, 240))
+                .setCamera(hardwareMap.get(WebcamName.class, "intakeCam"))
+                .enableLiveView(enableLiveView)
+                .setShowStatsOverlay(false)
+                .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
+                .setLiveViewContainerId(viewIds[1])
+                .build();
+        transferPortal = new VisionPortal.Builder()
+                .addProcessors(transferProcessor)
+                .setCameraResolution(new Size(320, 240))
+                .setCamera(hardwareMap.get(WebcamName.class, "transferCam"))
+                .enableLiveView(enableLiveView)
+                .setShowStatsOverlay(false)
+                .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
+                .setLiveViewContainerId(viewIds[2])
+                .build();
+
+        setEnableLiveView(false);
+    }
+
+    private void logVisionTelemetry() {
+        if (shooterPortal == null) {
+            telemetry.addLine("vision not initialized");
+            return;
+        }
+        telemetry.addLine("---- vision ----");
+        telemetry.addData("AprilTag FPS", shooterPortal.getFps());
+        telemetry.addData("Intake FPS", intakePortal.getFps());
+        telemetry.addData("Transfer FPS", transferPortal.getFps());
+        telemetry.addData("AprilTag detections", aprilTagProcessor.getDetections().size());
+        telemetry.addData("Intake blobs", intakeProcessor.getBlobs().size());
+        telemetry.addData("Transfer blobs", transferProcessor.getBlobs().size());
+        telemetry.addData("Intake process ms", intakeProcessor.getLastProcessMillis());
+        telemetry.addData("Transfer process ms", transferProcessor.getLastProcessMillis());
+        telemetry.addData("  intake cvt/inRange/contours/filter/sort",
+                String.format("%.1f/%.1f/%.1f/%.1f/%.1f",
+                        intakeProcessor.getLastColorConvertMillis(),
+                        intakeProcessor.getLastInMaskMillis(),
+                        intakeProcessor.getLastFindContoursMillis(),
+                        intakeProcessor.getLastFilterMillis(),
+                        intakeProcessor.getLastSortMillis()));
+    }
+
+    private void setVisionProcessing(boolean enabled) {
+        if (shooterPortal == null || intakePortal == null || transferPortal == null) {
+            return;
+        }
+        shooterPortal.setProcessorEnabled(aprilTagProcessor, enabled);
+        intakePortal.setProcessorEnabled(intakeProcessor, enabled);
+        transferPortal.setProcessorEnabled(transferProcessor, enabled);
+    }
+
+    private void stopVisionStreaming() {
+        if (shooterPortal == null) {
+            return;
+        }
+        shooterPortal.stopStreaming();
+        intakePortal.stopStreaming();
+        transferPortal.stopStreaming();
+    }
+
+    private void resumeVisionStreaming() {
+        if (shooterPortal == null) {
+            return;
+        }
+        shooterPortal.resumeStreaming();
+        intakePortal.resumeStreaming();
+        transferPortal.resumeStreaming();
+    }
+
+    private void setEnableLiveView(boolean set) {
+        if (set) {
+            shooterPortal.resumeLiveView();
+            intakePortal.resumeLiveView();
+            transferPortal.resumeLiveView();
+        }
+        else {
+            shooterPortal.stopLiveView();
+            intakePortal.stopLiveView();
+            transferPortal.stopLiveView();
+        }
+    }
+
+    private boolean waitForStreaming(VisionPortal portal, long timeoutMs) {
+        long startMs = System.currentTimeMillis();
+        while (portal.getCameraState() != VisionPortal.CameraState.STREAMING
+                && System.currentTimeMillis() - startMs < timeoutMs) {
+            telemetry.addLine("waiting for camera to stream: " + portal.getCameraState());
+            telemetry.update();
+        }
+        return portal.getCameraState() == VisionPortal.CameraState.STREAMING;
+    }
+
+    private boolean setExposure(VisionPortal portal, int exposureMicroseconds) {
+        if (portal.getCameraState() != VisionPortal.CameraState.STREAMING) {
+            Log.i("vision", "exiting early because not streaming");
+            return false;
+        }
+        ExposureControl control = portal.getCameraControl(ExposureControl.class);
+        if (control == null) {
+            Log.i("vision", "no exposure control");
+            return false;
+        }
+        control.setMode(ExposureControl.Mode.Manual);
+        Log.i("vision", "exposure before: " + control.getExposure(TimeUnit.MICROSECONDS));
+        Log.i("vision", "Camera Mode: " + control.getMode()
+                + " Exposure supported: " + control.isExposureSupported()
+                + " Exposure min: " + control.getMinExposure(TimeUnit.MICROSECONDS)
+                + " Exposure Max: " + control.getMaxExposure(TimeUnit.MICROSECONDS));
+        boolean worked = control.setExposure(exposureMicroseconds, TimeUnit.MICROSECONDS);
+        Log.i("vision", "exposure after: " + control.getExposure(TimeUnit.MICROSECONDS));
+        return worked;
+    }
+
+    private boolean waitForSetExposure(VisionPortal portal, int exposureMicroseconds, long timeoutMs, int maxAttempts) {
+        long startMs = System.currentTimeMillis();
+        int attempts = 0;
+        long msAfterStart = 0;
+        while (msAfterStart < timeoutMs && attempts++ < maxAttempts) {
+            Log.i("vision", String.format("Attempting to set camera exposure, attempt %d, %d ms after start", attempts, msAfterStart));
+            if (setExposure(portal, exposureMicroseconds)) {
+                Log.i("vision", "Set exposure succeeded");
+                return true;
+            }
+            msAfterStart = System.currentTimeMillis() - startMs;
+        }
+        Log.e("vision", "Set exposure failed");
+        return false;
     }
 }
