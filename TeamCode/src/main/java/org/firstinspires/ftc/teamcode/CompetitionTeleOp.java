@@ -23,6 +23,7 @@ import android.util.Size;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.teamcode.subsystems.vision.VisionSubsystem;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.opencv.ColorBlobLocatorProcessor;
@@ -57,24 +58,6 @@ public class CompetitionTeleOp extends LinearOpMode {
     public static int shooterVelocity = -5000;
     public static double rollerThrottle = 1.0;
     boolean isDown = false;
-
-    // ---- Vision (ported from VisionTest) ----
-    public static boolean visionEnabled = true;
-    public static boolean enableLiveView = false;
-
-    public static int SHOOTER_EXPOSURE_US = 10000;
-    public static int INTAKE_EXPOSURE_US = 10000;
-    public static long VISION_EXPOSURE_TIMEOUT_MS = 10000;
-    public static long VISION_STREAM_TIMEOUT_MS = 10000;
-    public static int VISION_EXPOSURE_MAX_ATTEMPTS = 670;
-
-    VisionPortal shooterPortal;
-    VisionPortal intakePortal;
-    VisionPortal transferPortal;
-
-    ColorBlobLocatorProcessorMulti intakeProcessor;
-    ColorBlobLocatorProcessorMulti transferProcessor;
-
     boolean lastX = false;
     boolean lastY = false;
     //public static double flywheelVelocity
@@ -97,21 +80,12 @@ public class CompetitionTeleOp extends LinearOpMode {
         PinpointSubsystem pinpoint = new PinpointSubsystem(hardwareMap);
         RampSpoolSubsystem spool = new RampSpoolSubsystem(hardwareMap);
         ColorSensorSubsystem colorSensor = new ColorSensorSubsystem(hardwareMap);
+        VisionSubsystem vision = new VisionSubsystem(hardwareMap, telemetry);
 
         MecanumDriveSubsystem drive = new MecanumDriveSubsystem(hardwareMap, () -> pinpoint.getHeading().getRadians());
         IMU.Parameters params = new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD, RevHubOrientationOnRobot.UsbFacingDirection.LEFT));
         IMU imu = hardwareMap.get(IMU.class, "imu");
         imu.initialize(params);
-
-        initVision();
-        if (visionEnabled) {
-            waitForStreaming(shooterPortal, VISION_STREAM_TIMEOUT_MS);
-            waitForStreaming(intakePortal, VISION_STREAM_TIMEOUT_MS);
-            waitForStreaming(transferPortal, VISION_STREAM_TIMEOUT_MS);
-            waitForSetExposure(shooterPortal, SHOOTER_EXPOSURE_US, VISION_EXPOSURE_TIMEOUT_MS, VISION_EXPOSURE_MAX_ATTEMPTS);
-            waitForSetExposure(intakePortal, INTAKE_EXPOSURE_US, VISION_EXPOSURE_TIMEOUT_MS, VISION_EXPOSURE_MAX_ATTEMPTS);
-            waitForSetExposure(transferPortal, INTAKE_EXPOSURE_US, VISION_EXPOSURE_TIMEOUT_MS, VISION_EXPOSURE_MAX_ATTEMPTS);
-        }
 
         //pinpoint.reset(); // QWC
         //spool.raise();
@@ -245,26 +219,6 @@ public class CompetitionTeleOp extends LinearOpMode {
 
             double distanceToGoal = pinpoint.getPose().getTranslation().getDistance(PositionConstants.getGoalPose().getTranslation());
 
-            // Vision toggles for loop-time testing:
-            //   dpad_up   = disable vision processing (baseline loop time)
-            //   dpad_down = re-enable vision processing
-            //   x / y     = stop / resume camera streaming
-            if (visionEnabled) {
-                if (gamepad1.dpad_up) {
-                    setEnableLiveView(false);
-                } else if (gamepad1.dpad_down) {
-                    setEnableLiveView(true);
-                }
-                if (gamepad1.x && !lastX) {
-                    stopVisionStreaming();
-                }
-                if (gamepad1.y && !lastY) {
-                    resumeVisionStreaming();
-                }
-                lastX = gamepad1.x;
-                lastY = gamepad1.y;
-            }
-
             //lastA = gamepad1.a;
             //telemetry.addData("pinpoint heading", pinpoint.getHeading().getDegrees());
             telemetry.addData("pinpointX", pinpoint.getPose().getX());
@@ -274,7 +228,6 @@ public class CompetitionTeleOp extends LinearOpMode {
             telemetry.addData("current loop ms", loopTime.milliseconds());
             telemetry.addData("running average ms", ((double)System.currentTimeMillis() - initialTime) / ((double) loops));
             telemetry.addData("distance to goal", distanceToGoal);
-            logVisionTelemetry();
             telemetry.update();
 
             shooter.update(pinpoint.getPose(), telemetry); // QWC
