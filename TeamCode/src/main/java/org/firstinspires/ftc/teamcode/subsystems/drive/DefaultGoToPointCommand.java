@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.subsystems.drive;
 
 import static gay.zharel.fastlane.UnitsKt.AppliedThrottle;
 import static gay.zharel.fastlane.UnitsKt.Throttle;
@@ -15,11 +15,10 @@ import com.arcrobotics.ftclib.geometry.Translation2d;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.teamcode.subsystems.LoggingConstants;
 import org.firstinspires.ftc.teamcode.subsystems.lib.DrivetrainSquIDController;
 import org.firstinspires.ftc.teamcode.subsystems.lib.SquIDController;
 import org.firstinspires.ftc.teamcode.subsystems.lib.Util;
-import org.firstinspires.ftc.teamcode.subsystems.pinpoint.PinpointSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.pinpoint.PinpointSubsystem;
 //import org.firstinspires.ftc.teamcode.subsystems.robot.StaticValues;
 
@@ -46,7 +45,7 @@ public class DefaultGoToPointCommand extends CommandBase {
     public double hTol = 6.7;
     public double maxTranslationPower = 1.0;
 
-    org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem drive;
+    MecanumDriveSubsystem drive;
     org.firstinspires.ftc.teamcode.subsystems.pinpoint.PinpointSubsystem pinpoint;
 
     public static boolean useVelCompensated = false;

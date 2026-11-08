@@ -38,21 +38,15 @@ import gay.zharel.fateweaver.telemetry.Fate;
 
 import org.firstinspires.ftc.teamcode.subsystems.ColorSensorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.PositionConstants;
-import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.CounterrollerSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.spool.LowerRampCommand;
-import org.firstinspires.ftc.teamcode.subsystems.spool.RaiseRampCommand;
 import org.firstinspires.ftc.teamcode.subsystems.spool.RampSpoolSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.pinpoint.PinpointSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.TransferSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.drive.MecanumDriveSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.transfer.TransferSubsystem;
 //import org.firstinspires.ftc.teamcode.subsystems.shooter.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.hood.HoodSubsystem2;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.rail.RailSubsystem2;
-
-import static dev.nextftc.units.Units.getDegreesPerSecond;
-import static gay.zharel.fastlane.UnitsKt.*;
 
 import java.util.List;
 
@@ -78,7 +72,6 @@ public class CompetitionTeleOp extends LinearOpMode {
     VisionPortal intakePortal;
     VisionPortal transferPortal;
 
-    AprilTagProcessor aprilTagProcessor;
     ColorBlobLocatorProcessorMulti intakeProcessor;
     ColorBlobLocatorProcessorMulti transferProcessor;
 
@@ -301,187 +294,4 @@ public class CompetitionTeleOp extends LinearOpMode {
         }
     }
 
-    // ---------------------------------------------------------------------
-    // Vision setup / helpers (ported from VisionTest)
-    // ---------------------------------------------------------------------
-
-    private void initVision() {
-        if (!visionEnabled) {
-            return;
-        }
-        int[] viewIds = VisionPortal.makeMultiPortalView(3, VisionPortal.MultiPortalLayout.VERTICAL);
-
-        aprilTagProcessor = new AprilTagProcessor.Builder()
-                .setDrawAxes(true)
-                .setDrawCubeProjection(true)
-                .setDrawTagID(true)
-                .setDrawTagOutline(true)
-                .setNumThreads(1)
-                .build();
-        aprilTagProcessor.setDecimation(2.0f);
-
-        intakeProcessor = new ColorBlobLocatorProcessorMulti(
-                new ColorRange(ColorSpace.HSV, new Scalar(255, 255, 255), new Scalar(161, 255, 255)),
-                ImageRegion.asImageCoordinates(0, 0, 320, 240),
-                ColorBlobLocatorProcessor.ContourMode.EXTERNAL_ONLY,
-                Color.rgb(255, 120, 31),
-                Color.rgb(255, 255, 255),
-                Color.rgb(3, 227, 252)
-        );
-        intakeProcessor.addColor(new ColorRange(ColorSpace.HSV, new Scalar(50, 50, 40), new Scalar(95, 255, 255)));
-        intakeProcessor.addColor(new ColorRange(ColorSpace.HSV, new Scalar(126, 50, 50), new Scalar(161, 255, 255)));
-        intakeProcessor.addFilter(new ColorBlobLocatorProcessor.BlobFilter(ColorBlobLocatorProcessor.BlobCriteria.BY_CONTOUR_AREA, 500, 1000000));
-
-        transferProcessor = new ColorBlobLocatorProcessorMulti(
-                new ColorRange(ColorSpace.HSV, new Scalar(255, 255, 255), new Scalar(161, 255, 255)),
-                ImageRegion.asImageCoordinates(0, 0, 320, 240),
-                ColorBlobLocatorProcessor.ContourMode.EXTERNAL_ONLY,
-                Color.rgb(255, 120, 31),
-                Color.rgb(255, 255, 255),
-                Color.rgb(3, 227, 252)
-        );
-        transferProcessor.addColor(new ColorRange(ColorSpace.HSV, new Scalar(50, 50, 40), new Scalar(95, 255, 255)));
-        transferProcessor.addColor(new ColorRange(ColorSpace.HSV, new Scalar(126, 50, 50), new Scalar(161, 255, 255)));
-        transferProcessor.addFilter(new ColorBlobLocatorProcessor.BlobFilter(ColorBlobLocatorProcessor.BlobCriteria.BY_CONTOUR_AREA, 500, 1000000));
-
-        shooterPortal = new VisionPortal.Builder()
-                .setCamera(hardwareMap.get(WebcamName.class, "shooterCam"))
-                .setCameraResolution(new Size(640, 480))
-                .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
-                .enableLiveView(enableLiveView)
-                .setShowStatsOverlay(false)
-                .setLiveViewContainerId(viewIds[0])
-                .addProcessor(aprilTagProcessor)
-                .build();
-        intakePortal = new VisionPortal.Builder()
-                .addProcessors(intakeProcessor)
-                .setCameraResolution(new Size(320, 240))
-                .setCamera(hardwareMap.get(WebcamName.class, "intakeCam"))
-                .enableLiveView(enableLiveView)
-                .setShowStatsOverlay(false)
-                .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
-                .setLiveViewContainerId(viewIds[1])
-                .build();
-        transferPortal = new VisionPortal.Builder()
-                .addProcessors(transferProcessor)
-                .setCameraResolution(new Size(320, 240))
-                .setCamera(hardwareMap.get(WebcamName.class, "transferCam"))
-                .enableLiveView(enableLiveView)
-                .setShowStatsOverlay(false)
-                .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
-                .setLiveViewContainerId(viewIds[2])
-                .build();
-
-        setEnableLiveView(false);
-    }
-
-    private void logVisionTelemetry() {
-        if (shooterPortal == null) {
-            telemetry.addLine("vision not initialized");
-            return;
-        }
-        telemetry.addLine("---- vision ----");
-        telemetry.addData("AprilTag FPS", shooterPortal.getFps());
-        telemetry.addData("Intake FPS", intakePortal.getFps());
-        telemetry.addData("Transfer FPS", transferPortal.getFps());
-        telemetry.addData("AprilTag detections", aprilTagProcessor.getDetections().size());
-        telemetry.addData("Intake blobs", intakeProcessor.getBlobs().size());
-        telemetry.addData("Transfer blobs", transferProcessor.getBlobs().size());
-        telemetry.addData("Intake process ms", intakeProcessor.getLastProcessMillis());
-        telemetry.addData("Transfer process ms", transferProcessor.getLastProcessMillis());
-        telemetry.addData("  intake cvt/inRange/contours/filter/sort",
-                String.format("%.1f/%.1f/%.1f/%.1f/%.1f",
-                        intakeProcessor.getLastColorConvertMillis(),
-                        intakeProcessor.getLastInMaskMillis(),
-                        intakeProcessor.getLastFindContoursMillis(),
-                        intakeProcessor.getLastFilterMillis(),
-                        intakeProcessor.getLastSortMillis()));
-    }
-
-    private void setVisionProcessing(boolean enabled) {
-        if (shooterPortal == null || intakePortal == null || transferPortal == null) {
-            return;
-        }
-        shooterPortal.setProcessorEnabled(aprilTagProcessor, enabled);
-        intakePortal.setProcessorEnabled(intakeProcessor, enabled);
-        transferPortal.setProcessorEnabled(transferProcessor, enabled);
-    }
-
-    private void stopVisionStreaming() {
-        if (shooterPortal == null) {
-            return;
-        }
-        shooterPortal.stopStreaming();
-        intakePortal.stopStreaming();
-        transferPortal.stopStreaming();
-    }
-
-    private void resumeVisionStreaming() {
-        if (shooterPortal == null) {
-            return;
-        }
-        shooterPortal.resumeStreaming();
-        intakePortal.resumeStreaming();
-        transferPortal.resumeStreaming();
-    }
-
-    private void setEnableLiveView(boolean set) {
-        if (set) {
-            shooterPortal.resumeLiveView();
-            intakePortal.resumeLiveView();
-            transferPortal.resumeLiveView();
-        }
-        else {
-            shooterPortal.stopLiveView();
-            intakePortal.stopLiveView();
-            transferPortal.stopLiveView();
-        }
-    }
-
-    private boolean waitForStreaming(VisionPortal portal, long timeoutMs) {
-        long startMs = System.currentTimeMillis();
-        while (portal.getCameraState() != VisionPortal.CameraState.STREAMING
-                && System.currentTimeMillis() - startMs < timeoutMs) {
-            telemetry.addLine("waiting for camera to stream: " + portal.getCameraState());
-            telemetry.update();
-        }
-        return portal.getCameraState() == VisionPortal.CameraState.STREAMING;
-    }
-
-    private boolean setExposure(VisionPortal portal, int exposureMicroseconds) {
-        if (portal.getCameraState() != VisionPortal.CameraState.STREAMING) {
-            Log.i("vision", "exiting early because not streaming");
-            return false;
-        }
-        ExposureControl control = portal.getCameraControl(ExposureControl.class);
-        if (control == null) {
-            Log.i("vision", "no exposure control");
-            return false;
-        }
-        control.setMode(ExposureControl.Mode.Manual);
-        Log.i("vision", "exposure before: " + control.getExposure(TimeUnit.MICROSECONDS));
-        Log.i("vision", "Camera Mode: " + control.getMode()
-                + " Exposure supported: " + control.isExposureSupported()
-                + " Exposure min: " + control.getMinExposure(TimeUnit.MICROSECONDS)
-                + " Exposure Max: " + control.getMaxExposure(TimeUnit.MICROSECONDS));
-        boolean worked = control.setExposure(exposureMicroseconds, TimeUnit.MICROSECONDS);
-        Log.i("vision", "exposure after: " + control.getExposure(TimeUnit.MICROSECONDS));
-        return worked;
-    }
-
-    private boolean waitForSetExposure(VisionPortal portal, int exposureMicroseconds, long timeoutMs, int maxAttempts) {
-        long startMs = System.currentTimeMillis();
-        int attempts = 0;
-        long msAfterStart = 0;
-        while (msAfterStart < timeoutMs && attempts++ < maxAttempts) {
-            Log.i("vision", String.format("Attempting to set camera exposure, attempt %d, %d ms after start", attempts, msAfterStart));
-            if (setExposure(portal, exposureMicroseconds)) {
-                Log.i("vision", "Set exposure succeeded");
-                return true;
-            }
-            msAfterStart = System.currentTimeMillis() - startMs;
-        }
-        Log.e("vision", "Set exposure failed");
-        return false;
-    }
 }

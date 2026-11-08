@@ -261,7 +261,7 @@ public class ShooterSubsystem extends SubsystemBase {
                 isUsingRollers ? rollerVelocity : RotationsPerMinute.of(0.0),
                 Degrees.of(0.0),
                 turretAngle,
-                ShooterElement.POLLEN
+                isPollen.getAsBoolean() ? ShooterElement.POLLEN : ShooterElement.NECTAR
         );
     }
 

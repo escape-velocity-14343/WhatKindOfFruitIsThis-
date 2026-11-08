@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems.pinpoint;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Utility;
 import gay.zharel.fateweaver.telemetry.Fate;
-import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.drive.MecanumDriveSubsystem;
 
 @Utility
 public class LocalizationTest extends LinearOpMode {

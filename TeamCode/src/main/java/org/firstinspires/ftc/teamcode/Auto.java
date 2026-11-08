@@ -1,12 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
-import static dev.nextftc.units.Units.RotationsPerMinute;
-
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
-import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -15,11 +12,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.subsystems.*;
-import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeOnCommand;
+import org.firstinspires.ftc.teamcode.subsystems.drive.DefaultGoToPointCommand;
+import org.firstinspires.ftc.teamcode.subsystems.drive.GoToPointWithDefaultCommand;
+import org.firstinspires.ftc.teamcode.subsystems.drive.MecanumDriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.pinpoint.PinpointSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.ShooterSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.FlywheelBaseSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.RollersOffCommand;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.RollersOnCommand;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.rail.RailSubsystem2;
@@ -27,9 +25,13 @@ import org.firstinspires.ftc.teamcode.subsystems.shooter.rail.RailSubsystem2;
 import java.util.List;
 
 import gay.zharel.fateweaver.telemetry.Fate;
-import org.firstinspires.ftc.teamcode.subsystems.spool.LowerRampCommand;
+
 import org.firstinspires.ftc.teamcode.subsystems.spool.RaiseRampCommand;
 import org.firstinspires.ftc.teamcode.subsystems.spool.RampSpoolSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.transfer.SmartTransferCommand;
+import org.firstinspires.ftc.teamcode.subsystems.transfer.TransferOffCommand;
+import org.firstinspires.ftc.teamcode.subsystems.transfer.TransferOnCommand;
+import org.firstinspires.ftc.teamcode.subsystems.transfer.TransferSubsystem;
 
 @Autonomous
 public class Auto extends LinearOpMode {
