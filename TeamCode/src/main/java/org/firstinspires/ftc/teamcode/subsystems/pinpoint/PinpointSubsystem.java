@@ -48,7 +48,7 @@ public class PinpointSubsystem extends SubsystemBase {
         pinpoint.initialize();
 
         // pinpoint.setYawScalar(yawScalar);
-        pinpoint.recalibrateIMU();
+//        pinpoint.recalibrateIMU();
 
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
 
