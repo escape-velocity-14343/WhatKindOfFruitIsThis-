@@ -57,11 +57,11 @@ public class ShooterSubsystem extends SubsystemBase {
     };
 
     public static double[] pollenFlywheelRpms = new double[]{
-            -2500.0,
-            -2500.0,
-            -2300.0,
+            -2600.0,
+            -2600.0,
             -2400.0,
-            -2500.0
+            -2500.0,
+            -2600.0
     };
 
     public static double[] pollenRollerRpms = new double[]{
@@ -106,7 +106,7 @@ public class ShooterSubsystem extends SubsystemBase {
     };
 
     public static double[] nectarTOFSeconds = new double[]{
-            0.6521,
+            0.55,
             0.6521,
             0.6521,
             0.726,
@@ -290,6 +290,8 @@ public class ShooterSubsystem extends SubsystemBase {
             for (int i = 0; i < 10; i++) {
                 Fate.log("Shooter/SOTM/Iteration" + i, tof);
                 Fate.log("Shooter/SOTM/Iteration" + i +"d", distance);
+
+                goalPose = PositionConstants.getGoalPose();
 
                 distance = robotPose.getTranslation().getDistance(goalPose.getTranslation());
                 tof = isPollen.getAsBoolean() ? pollenTOF.get(distance) : nectarTOF.get(distance);

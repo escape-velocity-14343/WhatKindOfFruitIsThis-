@@ -15,8 +15,8 @@ public class CounterrollerSubsystem extends FlywheelBaseSubsystem {
     public static FlywheelConfiguration config = new FlywheelConfiguration(
             0.01,
             0.01,
-            0.00015,
-            0.0,
+            0.00005,
+            0.000001,
             (1.0 / 28.0) * (31.0 / 28.0),
             FlywheelMode.VELOCITY_CONTROL,
             "Counterroller"

@@ -56,8 +56,8 @@ import java.util.List;
 @TeleOp(name = "TeleOp")
 public class CompetitionTeleOp extends LinearOpMode {
     public static int shooterVelocity = -5000;
-    public static double intakePhasePeriodSeconds = 0.5;
-    public static double intakePhaseSeconds = 0.1;
+    public static double intakePhasePeriodSeconds = -100;
+    public static double intakePhaseSeconds = 10;
     public static double rollerThrottle = 1.0;
     boolean isDown = false;
     boolean lastX = false;
