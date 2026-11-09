@@ -123,9 +123,6 @@ public class CompetitionTeleOp extends LinearOpMode {
             //}
             //if(gamepad1.y){hood.min();}
 
-            PositionConstants.goalXOffset = (pinpoint.getVelocity().getX() * .6) + (1.5 * pinpoint.getVelocity().getRotation().getRadians() * Math.sin(pinpoint.getHeading().getRadians()) * 0.6);
-            PositionConstants.goalYOffset = (pinpoint.getVelocity().getY() * .6) - (1.5 * pinpoint.getVelocity().getRotation().getRadians() * Math.cos(pinpoint.getHeading().getRadians()) * 0.6);
-
 
             if (gamepad1.rightBumperWasReleased()){
                 if (isDown){
@@ -174,7 +171,7 @@ public class CompetitionTeleOp extends LinearOpMode {
                 }
                 //shooter.rollers.setTargetVelocity(RotationsPerMinute.of(CounterrollerSubsystem.pollenRPM));
                 shooter.isUsingRollers = true;
-                shooter.update(pinpoint.getPose(), telemetry);
+                shooter.update(pinpoint.getPose(), pinpoint.getVelocity(), telemetry);
                 if (Math.abs(shooter.flywheel.getCurrentVelocity().into(RotationsPerMinute) - shooter.flywheel.getCurrentTargetVelocity().into(RotationsPerMinute)) < 280
                 && shooter.rollerPotentialVelocity.into(RotationsPerMinute) + 100 > shooter.rollers.getCurrentVelocity().into(RotationsPerMinute) && shooter.rollerPotentialVelocity.into(RotationsPerMinute) - 100 < shooter.rollers.getCurrentVelocity().into(RotationsPerMinute)){
                     transfer.transfer();
@@ -240,7 +237,7 @@ public class CompetitionTeleOp extends LinearOpMode {
             telemetry.addData("distance to goal", distanceToGoal);
             telemetry.update();
 
-            shooter.update(pinpoint.getPose(), telemetry); // QWC
+            shooter.update(pinpoint.getPose(), pinpoint.getVelocity(), telemetry); // QWC
 
             Fate.log("Util/LoopMs", loopTime.milliseconds());
             loopTime.reset();

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.lib;
 
 import com.arcrobotics.ftclib.util.InterpLUT;
+import com.qualcomm.robotcore.util.Range;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -99,6 +100,7 @@ public class TunableInterpLUT {
         if (Double.isNaN(input)) {
             return input;
         }
+        input = Range.clip(input, mX.get(0) + 0.1, mX.get(n - 1) - 0.1);
         if (input <= mX.get(0)) {
             throw new IllegalArgumentException("User requested value outside of bounds of LUT. Bounds are: " + mX.get(0).toString() + " to " + mX.get(n - 1).toString() + ". Value provided was: " + input);
         }
