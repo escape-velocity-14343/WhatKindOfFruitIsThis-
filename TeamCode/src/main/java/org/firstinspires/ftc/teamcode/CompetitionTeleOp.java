@@ -56,6 +56,8 @@ import java.util.List;
 @TeleOp(name = "TeleOp")
 public class CompetitionTeleOp extends LinearOpMode {
     public static int shooterVelocity = -5000;
+    public static double intakePhasePeriodSeconds = 0.5;
+    public static double intakePhaseSeconds = 0.1;
     public static double rollerThrottle = 1.0;
     boolean isDown = false;
     boolean lastX = false;
@@ -94,6 +96,8 @@ public class CompetitionTeleOp extends LinearOpMode {
         CommandScheduler.getInstance().cancelAll();
         waitForStart();
         ElapsedTime loopTime = new ElapsedTime();
+        ElapsedTime colorSensorTime = new ElapsedTime();
+        ElapsedTime intakePhaseTimer = new ElapsedTime();
         int loops = 0;
         long initialTime = System.currentTimeMillis();
         while (opModeIsActive()) {
@@ -134,24 +138,27 @@ public class CompetitionTeleOp extends LinearOpMode {
             //shooter.flywheel.setTargetVelocity(RotationsPerMinute.of(shooterVelocity));
             hood.max();
 
-            //if (gamepad2.a || gamepad1.a){
+            if (gamepad2.a || gamepad1.a){
+                rail.pollen();
+            }
+            if (gamepad2.b || gamepad1.b){
+                rail.nectar();
+            }
+
+            //if (colorSensor.proximityDetected()){
+            //    telemetry.addLine("proximity detected");
+            //    telemetry.addData("hue is:", colorSensor.getHsv());
+            //    if (colorSensor.yellowDetected()){
+            //        telemetry.addLine("yellow detected");
+            //        rail.pollen();
+            //    } else {
+            //        telemetry.addLine("yellow not detected");
+            //        rail.nectar();
+            //        colorSensorTime.reset();
+            //    }
+            //} else if (colorSensorTime.milliseconds() > 5000) {
             //    rail.pollen();
             //}
-            //if (gamepad2.b || gamepad1.b){
-            //    rail.nectar();
-            //}
-
-            if (colorSensor.proximityDetected()){
-                telemetry.addLine("proximity detected");
-                telemetry.addData("hue is:", colorSensor.getHsv());
-                if (colorSensor.yellowDetected()){
-                    telemetry.addLine("yellow detected");
-                    rail.pollen();
-                } else {
-                    telemetry.addLine("yellow not detected");
-                    rail.nectar();
-                }
-            }
 
             //rail.pollen();
 
@@ -161,7 +168,10 @@ public class CompetitionTeleOp extends LinearOpMode {
                 shooter.isUsingRollers = false;
             }
             else if (gamepad1.right_trigger > 0.5) {
-                intake.setPower(1);
+                intake.setPower(intakePhaseTimer.seconds() > intakePhaseSeconds ? 0 : 1);
+                if (intakePhaseTimer.seconds() > intakePhaseSeconds + intakePhasePeriodSeconds) {
+                    intakePhaseTimer.reset();
+                }
                 //shooter.rollers.setTargetVelocity(RotationsPerMinute.of(CounterrollerSubsystem.pollenRPM));
                 shooter.isUsingRollers = true;
                 shooter.update(pinpoint.getPose(), telemetry);

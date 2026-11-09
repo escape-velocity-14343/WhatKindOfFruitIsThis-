@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import java.util.function.BooleanSupplier;
 
+import gay.zharel.fateweaver.telemetry.Fate;
+
 
 @Config
 public class TransferSubsystem extends SubsystemBase {
@@ -26,6 +28,7 @@ public class TransferSubsystem extends SubsystemBase {
 
     public void setPower(double power) {
         transferMotor.setPower(power);
+        Fate.log("Transfer/Power", power);
     }
 
     public void transfer() {

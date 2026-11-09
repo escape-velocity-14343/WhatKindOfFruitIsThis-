@@ -13,9 +13,9 @@ import gay.zharel.fastlane.VoltageCache;
 @Config
 public class CounterrollerSubsystem extends FlywheelBaseSubsystem {
     public static FlywheelConfiguration config = new FlywheelConfiguration(
-            -0.0105,
             0.01,
-            -0.0001,
+            0.01,
+            0.00015,
             0.0,
             (1.0 / 28.0) * (31.0 / 28.0),
             FlywheelMode.VELOCITY_CONTROL,

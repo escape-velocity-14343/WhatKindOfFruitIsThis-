@@ -31,9 +31,10 @@ public class IntakeSubsystem extends SubsystemBase {
         // intakePivot = hardwareMap.servo.get("intake pivot");
     }
 
+    @Override
     public void periodic() {
         // this is usually cached so its prob fine
-        Fate.log("Intake/IntakeThrottle", intakeMotor.getPower());
+        //Fate.log("Intake/IntakeThrottle", intakeMotor.getPower());
         Fate.log("Intake/Pivot", pivotState);
     }
 
