@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.pinpoint;
 
+import static dev.nextftc.units.Units.*;
 import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.INCH;
 import static org.firstinspires.ftc.teamcode.subsystems.lib.Util.Pose2DConverter;
 
@@ -12,6 +13,8 @@ import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.arcrobotics.ftclib.geometry.Translation2d;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import dev.nextftc.control.geometry.PoseVelocity2d;
+import dev.nextftc.control.geometry.Vector2d;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
@@ -24,6 +27,7 @@ import java.util.Arrays;
 import gay.zharel.fateweaver.schemas.CustomStructSchema;
 import gay.zharel.fateweaver.schemas.DoubleSchema;
 import gay.zharel.fateweaver.telemetry.Fate;
+import org.firstinspires.ftc.teamcode.util.TimestampedData;
 
 
 @Config
@@ -38,6 +42,7 @@ public class PinpointSubsystem extends SubsystemBase {
     public static double yEncOffset = -3.8;
 
     private Pose2D lastGoodPose = new Pose2D(INCH, 0, 0, AngleUnit.DEGREES, 0);
+    public long currentTimestamp = 0;
     //FieldD fieldDrawing = new FieldDrawing();
     double turretOffsetX = -81 / 25.4;
     Pose2d offset = new Pose2d(0, 0, new Rotation2d(0));
@@ -80,6 +85,7 @@ public class PinpointSubsystem extends SubsystemBase {
             Log.i("%11", "pinpoint NaN value");
         } else {
             pose = pinpoint.getPosition();
+            currentTimestamp = System.nanoTime();
             lastGoodPose = pose;
         }
 
@@ -140,6 +146,16 @@ public class PinpointSubsystem extends SubsystemBase {
                 pinpoint.getVelX(INCH),
                 pinpoint.getVelY(INCH),
                 Rotation2d.fromDegrees(pinpoint.getHeadingVelocity(UnnormalizedAngleUnit.DEGREES)));
+    }
+
+    public TimestampedData<PoseVelocity2d> getVelocityBetter() {
+        return new TimestampedData<>(new PoseVelocity2d(
+                new Vector2d<>(
+                        InchesPerSecond.of(pinpoint.getVelX(INCH)),
+                        InchesPerSecond.of(pinpoint.getVelY(INCH))
+                ),
+                DegreesPerSecond.of(pinpoint.getHeadingVelocity(UnnormalizedAngleUnit.DEGREES))
+        ), currentTimestamp);
     }
 
     //@Override

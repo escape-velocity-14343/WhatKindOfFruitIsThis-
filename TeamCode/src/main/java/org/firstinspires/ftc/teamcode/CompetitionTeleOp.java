@@ -171,7 +171,7 @@ public class CompetitionTeleOp extends LinearOpMode {
                 }
                 //shooter.rollers.setTargetVelocity(RotationsPerMinute.of(CounterrollerSubsystem.pollenRPM));
                 shooter.isUsingRollers = true;
-                shooter.update(pinpoint.getPose(), pinpoint.getVelocity(), telemetry);
+                shooter.update(pinpoint.getPose(), pinpoint.getVelocityBetter(), telemetry);
                 if (Math.abs(shooter.flywheel.getCurrentVelocity().into(RotationsPerMinute) - shooter.flywheel.getCurrentTargetVelocity().into(RotationsPerMinute)) < 280
                 && shooter.rollerPotentialVelocity.into(RotationsPerMinute) + 100 > shooter.rollers.getCurrentVelocity().into(RotationsPerMinute) && shooter.rollerPotentialVelocity.into(RotationsPerMinute) - 100 < shooter.rollers.getCurrentVelocity().into(RotationsPerMinute)){
                     transfer.transfer();
@@ -237,7 +237,7 @@ public class CompetitionTeleOp extends LinearOpMode {
             telemetry.addData("distance to goal", distanceToGoal);
             telemetry.update();
 
-            shooter.update(pinpoint.getPose(), pinpoint.getVelocity(), telemetry); // QWC
+            shooter.update(pinpoint.getPose(), pinpoint.getVelocityBetter(), telemetry); // QWC
 
             Fate.log("Util/LoopMs", loopTime.milliseconds());
             loopTime.reset();

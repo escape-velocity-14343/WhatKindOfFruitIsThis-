@@ -10,6 +10,7 @@ import com.arcrobotics.ftclib.util.InterpLUT;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
+import dev.nextftc.control.geometry.PoseVelocity2d;
 import dev.nextftc.units.measuretypes.Angle;
 import dev.nextftc.units.measuretypes.AngularVelocity;
 import gay.zharel.fateweaver.schemas.CustomStructSchema;
@@ -27,6 +28,8 @@ import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.FlywheelSubsys
 import org.firstinspires.ftc.teamcode.subsystems.shooter.hood.HoodSubsystem;
 //import org.firstinspires.ftc.teamcode.subsystems.shooter.rail.RailSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.turret.TurretSubsystem;
+import org.firstinspires.ftc.teamcode.util.DataInterpolator;
+import org.firstinspires.ftc.teamcode.util.TimestampedData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,6 +117,7 @@ public class ShooterSubsystem extends SubsystemBase {
     };
 
     public static boolean enableSOTM = true;
+    public static double offsetSeconds = 0.0875;
 
     public TunableInterpLUT pollenVelocity = new TunableInterpLUT();
     public TunableInterpLUT nectarVelocity = new TunableInterpLUT();
@@ -183,7 +187,13 @@ public class ShooterSubsystem extends SubsystemBase {
             ShooterElement.POLLEN
     );
     public AngularVelocity rollerPotentialVelocity = RotationsPerMinute.of(0.0);
-    public ShooterSubsystem(HardwareMap hardwareMap) {
+
+    public DataInterpolator<PoseVelocity2d> velocityInterpolator = new DataInterpolator<PoseVelocity2d>(
+            PoseVelocity2d::plus,
+            PoseVelocity2d::times
+    );
+    private Telemetry telemetry;
+    public ShooterSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         pollenVelocity.mX = Arrays.stream(pollenDistances).boxed().collect(Collectors.toList());
         pollenVelocity.mY = Arrays.stream(pollenFlywheelRpms).boxed().collect(Collectors.toList());
         pollenVelocity.createLUT();
@@ -222,8 +232,7 @@ public class ShooterSubsystem extends SubsystemBase {
     /**
      * implement when we start actually aiming! sets all the targets that we want
      */
-    public void update(Pose2d robotPose, Pose2d robotVelocity, Telemetry telemetry) {
-
+    public void update(Pose2d robotPose, TimestampedData<PoseVelocity2d> robotVelocity, long timestamp) {
         // update luts
         pollenVelocity.mX = Arrays.stream(pollenDistances).boxed().collect(Collectors.toList());
         pollenVelocity.mY = Arrays.stream(pollenFlywheelRpms).boxed().collect(Collectors.toList());
@@ -249,7 +258,9 @@ public class ShooterSubsystem extends SubsystemBase {
         nectarTOF.mY = Arrays.stream(nectarTOFSeconds).boxed().collect(Collectors.toList());
         nectarTOF.createLUT();
 
-        this.state = calculateTargetShooterState(robotPose, robotVelocity, telemetry);
+        this.velocityInterpolator.addData(robotVelocity);
+
+        this.state = calculateTargetShooterState(robotPose);
 
         //this.rollers.setTargetVelocity(state.rollerAngVel);
         //this.flywheel.setTargetVelocity(state.flywheelAngVel);
@@ -270,7 +281,9 @@ public class ShooterSubsystem extends SubsystemBase {
         ), shooterStateSchema);
     }
 
-    public ShooterState calculateTargetShooterState(Pose2d robotPose, Pose2d robotVelocity, Telemetry telemetry) {
+    public ShooterState calculateTargetShooterState(Pose2d robotPose) {
+
+        PoseVelocity2d robotVelocity = velocityInterpolator.getData(System.currentTimeMillis() / 1000d - offsetSeconds);
 
         PositionConstants.goalXOffset = 0.0;
         PositionConstants.goalYOffset = 0.0;
@@ -284,8 +297,8 @@ public class ShooterSubsystem extends SubsystemBase {
         if (enableSOTM) {
             double tof = isPollen.getAsBoolean() ? pollenTOF.get(distance) : nectarTOF.get(distance);
 
-            PositionConstants.goalXOffset = (robotVelocity.getX() * tof);
-            PositionConstants.goalYOffset = (robotVelocity.getY() * tof);
+            PositionConstants.goalXOffset = (robotVelocity.linearVel.x.into(InchesPerSecond) * tof);
+            PositionConstants.goalYOffset = (robotVelocity.linearVel.y.into(InchesPerSecond) * tof);
 
             for (int i = 0; i < 10; i++) {
                 Fate.log("Shooter/SOTM/Iteration" + i, tof);
@@ -296,8 +309,8 @@ public class ShooterSubsystem extends SubsystemBase {
                 distance = robotPose.getTranslation().getDistance(goalPose.getTranslation());
                 tof = isPollen.getAsBoolean() ? pollenTOF.get(distance) : nectarTOF.get(distance);
 
-                PositionConstants.goalXOffset = (robotVelocity.getX() * tof);
-                PositionConstants.goalYOffset = (robotVelocity.getY() * tof);
+                PositionConstants.goalXOffset = (robotVelocity.linearVel.x.into(InchesPerSecond) * tof);
+                PositionConstants.goalYOffset = (robotVelocity.linearVel.y.into(InchesPerSecond) * tof);
             }
         }
         Fate.log("Goal/GoalPose", goalPose, LoggingConstants.poseSchema);

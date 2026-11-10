@@ -151,7 +151,7 @@ public class Auto extends LinearOpMode {
             }
 
             CommandScheduler.getInstance().run();
-            shooter.update(pinpoint.getPose(), pinpoint.getVelocity(), telemetry);
+            shooter.update(pinpoint.getPose(), pinpoint.getVelocityBetter(), telemetry);
             Fate.log("Util/LoopMs", loopTime.milliseconds());
             loopTime.reset();
             telemetry.update();
