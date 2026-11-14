@@ -29,6 +29,7 @@ import org.firstinspires.ftc.teamcode.subsystems.shooter.hood.HoodSubsystem;
 //import org.firstinspires.ftc.teamcode.subsystems.shooter.rail.RailSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.turret.TurretSubsystem;
 import org.firstinspires.ftc.teamcode.util.DataInterpolator;
+import org.firstinspires.ftc.teamcode.util.TimeSource;
 import org.firstinspires.ftc.teamcode.util.TimestampedData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +57,9 @@ public class ShooterSubsystem extends SubsystemBase {
             45.7,
             53.0,
             58.0,
-            68.0
+            68.0,
+            75.0,
+            90.0
     };
 
     public static double[] pollenFlywheelRpms = new double[]{
@@ -64,7 +67,9 @@ public class ShooterSubsystem extends SubsystemBase {
             -2600.0,
             -2400.0,
             -2500.0,
-            -2600.0
+            -2600.0,
+            -3000.0,
+            -3000.0
     };
 
     public static double[] pollenRollerRpms = new double[]{
@@ -72,31 +77,54 @@ public class ShooterSubsystem extends SubsystemBase {
             -4000.0,
             -4700.0,
             -4700.0,
-            -4700.0
+            -4700.0,
+            -5000.0,
+            -5200.0
     };
 
     public static double[] nectarDistances = new double[]{
-            37.3,
-            45.7,
-            53.0,
-            58.0,
-            68.0
+            48,
+            51,
+            53,
+            67, //not very good
+            93, // absolutely not
+            ////
+            //37.3,
+            //45.7,
+            //53.0,
+            //58.0,
+            //68.0,
+            //75.0
     };
 
     public static double[] nectarFlywheelRpms = new double[]{
-            -2800.0,
-            -2800.0,
-            -3000.0,
-            -3025.0,
-            -3100.0
+            -3100,
+            -3100,
+            -3100,
+            -3400,
+            -3900,
+            ////
+            //-2800.0,
+            //-2800.0,
+            //-3000.0,
+            //-3025.0,
+            //-3100.0,
+            //-3300.0
     };
 
     public static double[] nectarRollerRpms = new double[]{
-            -4700.0,
-            -4700.0,
-            -4700.0,
-            -4900.0,
-            -4900.0
+            -4900,
+            -4900,
+            -4900,
+            -4900,
+            -5700,
+            ////
+            //-4700.0,
+            //-4700.0,
+            //-4700.0,
+            //-4900.0,
+            //-4900.0,
+            //-5200.0
     };
 
 
@@ -105,15 +133,21 @@ public class ShooterSubsystem extends SubsystemBase {
             0.6521,
             0.6521,
             0.726,
-            0.726
+            0.726,
+            0.8,
+            0.8
     };
 
     public static double[] nectarTOFSeconds = new double[]{
+
+            //
             0.55,
-            0.6521,
-            0.6521,
-            0.726,
-            0.726
+            .6,
+            //0.7,
+            0.8,
+            //0.9,
+            0.9,
+            1.0
     };
 
     public static boolean enableSOTM = true;
@@ -223,6 +257,9 @@ public class ShooterSubsystem extends SubsystemBase {
         this.hood = new HoodSubsystem(hardwareMap);
         //this.rail = new RailSubsystem(hardwareMap);
         this.turret = new TurretSubsystem(hardwareMap);
+        this.telemetry = telemetry;
+
+        velocityInterpolator.setKeepSeconds(0.5);
     }
 
     public void setPollenSupplier(BooleanSupplier isPollen) {
@@ -232,7 +269,7 @@ public class ShooterSubsystem extends SubsystemBase {
     /**
      * implement when we start actually aiming! sets all the targets that we want
      */
-    public void update(Pose2d robotPose, TimestampedData<PoseVelocity2d> robotVelocity, long timestamp) {
+    public void update(Pose2d robotPose, TimestampedData<PoseVelocity2d> robotVelocity) {
         // update luts
         pollenVelocity.mX = Arrays.stream(pollenDistances).boxed().collect(Collectors.toList());
         pollenVelocity.mY = Arrays.stream(pollenFlywheelRpms).boxed().collect(Collectors.toList());
@@ -283,7 +320,13 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public ShooterState calculateTargetShooterState(Pose2d robotPose) {
 
-        PoseVelocity2d robotVelocity = velocityInterpolator.getData(System.currentTimeMillis() / 1000d - offsetSeconds);
+        PoseVelocity2d robotVelocity = velocityInterpolator.getData(TimeSource.getTimestamp() - offsetSeconds);
+
+        Fate.log("Shooter/RobotVel", new Pose2d(
+                robotVelocity.linearVel.x.into(InchesPerSecond),
+                robotVelocity.linearVel.y.into(InchesPerSecond),
+                Rotation2d.fromDegrees(robotVelocity.angVel.into(DegreesPerSecond))
+        ), LoggingConstants.poseSchema);
 
         PositionConstants.goalXOffset = 0.0;
         PositionConstants.goalYOffset = 0.0;

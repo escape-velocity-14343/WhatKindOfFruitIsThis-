@@ -27,6 +27,8 @@ import java.util.Arrays;
 import gay.zharel.fateweaver.schemas.CustomStructSchema;
 import gay.zharel.fateweaver.schemas.DoubleSchema;
 import gay.zharel.fateweaver.telemetry.Fate;
+
+import org.firstinspires.ftc.teamcode.util.TimeSource;
 import org.firstinspires.ftc.teamcode.util.TimestampedData;
 
 
@@ -38,8 +40,8 @@ public class PinpointSubsystem extends SubsystemBase {
 
     public static boolean flipX = false;
     public static boolean flipY = true;
-    public static double xEncOffset = 2.8;
-    public static double yEncOffset = -3.8;
+    public static double xEncOffset = 4.75;
+    public static double yEncOffset = -3.5;
 
     private Pose2D lastGoodPose = new Pose2D(INCH, 0, 0, AngleUnit.DEGREES, 0);
     public long currentTimestamp = 0;
@@ -85,7 +87,7 @@ public class PinpointSubsystem extends SubsystemBase {
             Log.i("%11", "pinpoint NaN value");
         } else {
             pose = pinpoint.getPosition();
-            currentTimestamp = System.nanoTime();
+            currentTimestamp = TimeSource.getTimestampNanos();
             lastGoodPose = pose;
         }
 
@@ -112,6 +114,10 @@ public class PinpointSubsystem extends SubsystemBase {
                 getSDKPose().getX(INCH) + offset.getX(),
                 getSDKPose().getY(INCH) + offset.getY(),
                 Rotation2d.fromDegrees(getSDKPose().getHeading(AngleUnit.DEGREES)).plus(offset.getRotation()));
+    }
+
+    public TimestampedData<Pose2d> getTimestampedPose() {
+        return new TimestampedData<>(getPose(), currentTimestamp);
     }
 
     public void setPose(Pose2d pose) {

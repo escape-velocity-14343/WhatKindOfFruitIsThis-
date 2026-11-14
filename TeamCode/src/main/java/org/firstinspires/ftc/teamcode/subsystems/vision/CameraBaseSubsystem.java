@@ -52,13 +52,12 @@ public abstract class CameraBaseSubsystem extends SubsystemBase {
     protected final VisionPortal.Builder visionPortalBuilder;
     protected final Telemetry telemetry;
     protected final CameraConfig config;
-    protected final VisionProcessor[] processors;
+    protected VisionProcessor[] processors;
     private boolean lastLiveView = false;
 
-    public CameraBaseSubsystem(HardwareMap hardwareMap, int viewId, Telemetry telemetry, CameraConfig config, VisionProcessor... processors) {
+    public CameraBaseSubsystem(HardwareMap hardwareMap, int viewId, Telemetry telemetry, CameraConfig config) {
         this.telemetry = telemetry;
         this.config = config;
-        this.processors = processors;
 
         visionPortalBuilder = new VisionPortal.Builder()
                 .setCamera(hardwareMap.get(WebcamName.class, config.hardwareMapName))
@@ -72,6 +71,7 @@ public abstract class CameraBaseSubsystem extends SubsystemBase {
     }
 
     protected void buildVisionPortal(VisionProcessor... processors) {
+        this.processors = processors;
         visionPortalBuilder.addProcessors(processors);
         visionPortal = visionPortalBuilder.build();
     }

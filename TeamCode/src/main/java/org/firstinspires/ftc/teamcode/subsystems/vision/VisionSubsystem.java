@@ -18,19 +18,22 @@ public class VisionSubsystem extends SubsystemBase {
     public static long VISION_EXPOSURE_TIMEOUT_MS = 10000;
     public static long VISION_STREAM_TIMEOUT_MS = 10000;
     public static int VISION_EXPOSURE_MAX_ATTEMPTS = 670;
+    public static double TRANSLATION_STDEV = 1.0;
+    public static double ROTATION_STDEV = 1.0;
     public ApriltagSubsystem aprilTag;
     public IntakeCameraSubsystem intakeCam;
     public TransferCameraSubsystem transferCam;
     private final Telemetry telemetry;
 
     public VisionSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
-        int[] viewIds = VisionPortal.makeMultiPortalView(3, VisionPortal.MultiPortalLayout.VERTICAL);
+        //int[] viewIds = VisionPortal.makeMultiPortalView(1, VisionPortal.MultiPortalLayout.VERTICAL);
+        int[] viewIds = new int[]{VisionPortal.DEFAULT_VIEW_CONTAINER_ID};
 
         this.telemetry = telemetry;
 
         aprilTag = new ApriltagSubsystem(hardwareMap, viewIds[0], telemetry);
-        intakeCam = new IntakeCameraSubsystem(hardwareMap, viewIds[1], telemetry);
-        transferCam = new TransferCameraSubsystem(hardwareMap, viewIds[2], telemetry);
+        //intakeCam = new IntakeCameraSubsystem(hardwareMap, viewIds[1], telemetry);
+        //transferCam = new TransferCameraSubsystem(hardwareMap, viewIds[2], telemetry);
     }
 
     public void waitForStartStreaming() {
@@ -44,8 +47,8 @@ public class VisionSubsystem extends SubsystemBase {
         waitForStartStreaming();
 
         aprilTag.waitForSetExposure(SHOOTER_EXPOSURE_US, VISION_EXPOSURE_TIMEOUT_MS, VISION_EXPOSURE_MAX_ATTEMPTS);
-        intakeCam.waitForSetExposure(INTAKE_EXPOSURE_US, VISION_EXPOSURE_TIMEOUT_MS, VISION_EXPOSURE_MAX_ATTEMPTS);
-        transferCam.waitForSetExposure(TRANSFER_EXPOSURE_US, VISION_EXPOSURE_TIMEOUT_MS, VISION_EXPOSURE_MAX_ATTEMPTS);
+        //intakeCam.waitForSetExposure(INTAKE_EXPOSURE_US, VISION_EXPOSURE_TIMEOUT_MS, VISION_EXPOSURE_MAX_ATTEMPTS);
+        //transferCam.waitForSetExposure(TRANSFER_EXPOSURE_US, VISION_EXPOSURE_TIMEOUT_MS, VISION_EXPOSURE_MAX_ATTEMPTS);
     }
 
 }

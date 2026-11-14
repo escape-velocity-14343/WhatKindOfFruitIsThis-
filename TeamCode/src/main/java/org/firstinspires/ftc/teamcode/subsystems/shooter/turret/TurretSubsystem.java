@@ -11,7 +11,7 @@ public class TurretSubsystem {
     private ServoImplEx turretServo1;
     private ServoImplEx turretServo2;
 
-    public static double offsetDegrees = 176;
+    public static double offsetDegrees = 172;
 
     public TurretSubsystem(HardwareMap hardwareMap) {
         turretServo1 = (ServoImplEx) hardwareMap.get(Servo.class, "turret1");
@@ -29,5 +29,9 @@ public class TurretSubsystem {
 
     public void setDegrees(double degrees){
         setPos((degrees + offsetDegrees)/360);
+    }
+
+    public double getDegrees(){
+        return turretServo1.getPosition() * 360 + offsetDegrees;
     }
 }

@@ -44,7 +44,7 @@ public class Auto extends LinearOpMode {
         PositionConstants.rightGoalIsUp = true;
 
         IntakeSubsystem intake = new IntakeSubsystem(hardwareMap);
-        ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap);
+        ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap, telemetry);
         RailSubsystem2 rail = new RailSubsystem2(hardwareMap);
         shooter.setPollenSupplier(rail::getIsPollen);
 
@@ -151,7 +151,7 @@ public class Auto extends LinearOpMode {
             }
 
             CommandScheduler.getInstance().run();
-            shooter.update(pinpoint.getPose(), pinpoint.getVelocityBetter(), telemetry);
+            shooter.update(pinpoint.getPose(), pinpoint.getVelocityBetter());
             Fate.log("Util/LoopMs", loopTime.milliseconds());
             loopTime.reset();
             telemetry.update();

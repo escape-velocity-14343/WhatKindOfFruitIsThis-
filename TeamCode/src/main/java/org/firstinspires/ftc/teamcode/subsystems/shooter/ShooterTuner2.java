@@ -17,7 +17,7 @@ public class ShooterTuner2 extends LinearOpMode {
 
     @Override
     public void runOpMode(){
-        ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap);
+        ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap, telemetry);
 
         IntakeSubsystem intake = new IntakeSubsystem(hardwareMap);
         TransferSubsystem transfer = new TransferSubsystem(hardwareMap, () -> true);

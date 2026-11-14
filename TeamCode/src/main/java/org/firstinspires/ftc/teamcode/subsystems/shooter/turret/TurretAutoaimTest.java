@@ -14,7 +14,7 @@ public class TurretAutoaimTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap);
+        ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap, telemetry);
         PinpointSubsystem pinpoint = new PinpointSubsystem(hardwareMap);
         MecanumDriveSubsystem mecanum = new MecanumDriveSubsystem(hardwareMap, () -> pinpoint.getHeading().getRadians());
 
@@ -28,7 +28,7 @@ public class TurretAutoaimTest extends LinearOpMode {
             pinpoint.periodic();
 
             mecanum.drive(-gamepad1.left_stick_y, -gamepad1.left_stick_x, gamepad1.right_stick_x);
-            shooter.update(pinpoint.getPose(), pinpoint.getVelocityBetter(), telemetry);
+            shooter.update(pinpoint.getPose(), pinpoint.getVelocityBetter());
 
             telemetry.addData("target shooter degrees", shooter.state.turretAngle.into(Degrees));
             telemetry.addData("Pinpoint pose", pinpoint.getPose());

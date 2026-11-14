@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.util;
 
 import java.sql.Time;
 
-public class TimestampedData<T> extends Comparable<TimestampedData<T>> {
+public class TimestampedData<T> implements Comparable<TimestampedData<T>> {
 
     public T data;
     public long nanoTime;
@@ -20,7 +20,7 @@ public class TimestampedData<T> extends Comparable<TimestampedData<T>> {
 
 
     public double getDeltaSeconds() {
-        return System.nanoTime() / 1e9d - this.seconds;
+        return TimeSource.getTimestamp() - this.seconds;
     }
 
     public double getDeltaSeconds(TimestampedData<T> other) {

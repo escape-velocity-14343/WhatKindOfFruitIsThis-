@@ -18,6 +18,7 @@ public class TransferSubsystem extends SubsystemBase {
     public static double transferNectarTransferSpeed = 1;
     public static double transferRejectSpeed = -0.3;
     public static double autoteansferSpeed = 0.5;
+    public static double transferOffSpeed = -0.3;
 
     private BooleanSupplier isPollen;
     DcMotor transferMotor;
@@ -48,6 +49,6 @@ public class TransferSubsystem extends SubsystemBase {
     }
 
     public void off() {
-        setPower(0.0);
+        setPower(transferOffSpeed);
     }
 }

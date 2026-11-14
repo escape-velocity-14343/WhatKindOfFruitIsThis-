@@ -45,7 +45,7 @@ public class ShooterTuner extends LinearOpMode {
 
         telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), telemetry);
 
-        ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap);
+        ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap, telemetry);
 
         if (enableIntakeTransfer) {
             intake = new IntakeSubsystem(hardwareMap);

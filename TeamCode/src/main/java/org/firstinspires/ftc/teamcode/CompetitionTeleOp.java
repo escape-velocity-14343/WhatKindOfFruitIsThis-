@@ -9,6 +9,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
+import com.arcrobotics.ftclib.geometry.Translation2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -21,9 +22,9 @@ import android.graphics.Color;
 import android.util.Log;
 import android.util.Size;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
-import org.firstinspires.ftc.teamcode.subsystems.vision.VisionSubsystem;
+//import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+//import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+//import org.firstinspires.ftc.teamcode.subsystems.vision.VisionSubsystem;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.opencv.ColorBlobLocatorProcessor;
@@ -62,6 +63,8 @@ public class CompetitionTeleOp extends LinearOpMode {
     boolean isDown = false;
     boolean lastX = false;
     boolean lastY = false;
+    public static boolean readyToShoot = false;
+    public static int angleThreshold = 45;
     //public static double flywheelVelocity
 
     @Override
@@ -77,12 +80,12 @@ public class CompetitionTeleOp extends LinearOpMode {
         RailSubsystem2 rail = new RailSubsystem2(hardwareMap);
         IntakeSubsystem intake = new IntakeSubsystem(hardwareMap);
         TransferSubsystem transfer = new TransferSubsystem(hardwareMap, rail::getIsPollen);
-        ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap);
+        ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap, telemetry);
         shooter.setPollenSupplier(rail::getIsPollen);
         PinpointSubsystem pinpoint = new PinpointSubsystem(hardwareMap);
         RampSpoolSubsystem spool = new RampSpoolSubsystem(hardwareMap);
         ColorSensorSubsystem colorSensor = new ColorSensorSubsystem(hardwareMap);
-        VisionSubsystem vision = new VisionSubsystem(hardwareMap, telemetry);
+        //VisionSubsystem vision = new VisionSubsystem(hardwareMap, telemetry);
 
         MecanumDriveSubsystem drive = new MecanumDriveSubsystem(hardwareMap, () -> pinpoint.getHeading().getRadians());
         IMU.Parameters params = new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD, RevHubOrientationOnRobot.UsbFacingDirection.LEFT));
@@ -101,6 +104,17 @@ public class CompetitionTeleOp extends LinearOpMode {
         int loops = 0;
         long initialTime = System.currentTimeMillis();
         while (opModeIsActive()) {
+            Translation2d differenceBetweenPoses = PositionConstants.getGoalPose().getTranslation().minus(pinpoint.getPose().getTranslation());
+            double angleToGoal = (Math.toDegrees(Math.atan2(differenceBetweenPoses.getY(), differenceBetweenPoses.getX())));
+            //pinpoint.getPose().getTranslation().getDistance()
+            telemetry.addData("angle", angleToGoal);
+            telemetry.addData("turret angle", shooter.state.turretAngle.into(Degrees));
+            telemetry.addData("readyToShoot", readyToShoot);
+            telemetry.addData("autoshoot", (angleToGoal>=angleThreshold)
+                    && readyToShoot
+                    && shooter.state.turretAngle.into(Degrees) < 170
+                    && shooter.state.turretAngle.into(Degrees) > -170);
+
             for (LynxModule hub : hubs) {
                 hub.clearBulkCache();
             }
@@ -142,6 +156,10 @@ public class CompetitionTeleOp extends LinearOpMode {
                 rail.nectar();
             }
 
+            if (gamepad2.rightTriggerWasReleased()){
+                readyToShoot = !readyToShoot;
+            }
+
             //if (colorSensor.proximityDetected()){
             //    telemetry.addLine("proximity detected");
             //    telemetry.addData("hue is:", colorSensor.getHsv());
@@ -164,14 +182,21 @@ public class CompetitionTeleOp extends LinearOpMode {
                 transfer.reject();
                 shooter.isUsingRollers = false;
             }
-            else if (gamepad1.right_trigger > 0.5) {
+
+            else if ((gamepad1.right_trigger > 0.5) | (angleToGoal>=angleThreshold | angleToGoal<=-angleThreshold)
+                    && readyToShoot
+                    && shooter.state.turretAngle.into(Degrees) < 170
+                    && shooter.state.turretAngle.into(Degrees) > -170
+                    && readyToShoot
+                    && shooter.state.turretAngle.into(Degrees) < 170
+                    && shooter.state.turretAngle.into(Degrees) > -170) {
                 intake.setPower(intakePhaseTimer.seconds() > intakePhaseSeconds ? 0 : 1);
                 if (intakePhaseTimer.seconds() > intakePhaseSeconds + intakePhasePeriodSeconds) {
                     intakePhaseTimer.reset();
                 }
                 //shooter.rollers.setTargetVelocity(RotationsPerMinute.of(CounterrollerSubsystem.pollenRPM));
                 shooter.isUsingRollers = true;
-                shooter.update(pinpoint.getPose(), pinpoint.getVelocityBetter(), telemetry);
+                shooter.update(pinpoint.getPose(), pinpoint.getVelocityBetter());
                 if (Math.abs(shooter.flywheel.getCurrentVelocity().into(RotationsPerMinute) - shooter.flywheel.getCurrentTargetVelocity().into(RotationsPerMinute)) < 280
                 && shooter.rollerPotentialVelocity.into(RotationsPerMinute) + 100 > shooter.rollers.getCurrentVelocity().into(RotationsPerMinute) && shooter.rollerPotentialVelocity.into(RotationsPerMinute) - 100 < shooter.rollers.getCurrentVelocity().into(RotationsPerMinute)){
                     transfer.transfer();
@@ -182,7 +207,7 @@ public class CompetitionTeleOp extends LinearOpMode {
             }
             else if (gamepad1.left_trigger > 0.5){
                 intake.setPower(1);
-                transfer.setPower(0.8);
+                transfer.off();
                 shooter.isUsingRollers = true;
             }
             else {
@@ -237,7 +262,7 @@ public class CompetitionTeleOp extends LinearOpMode {
             telemetry.addData("distance to goal", distanceToGoal);
             telemetry.update();
 
-            shooter.update(pinpoint.getPose(), pinpoint.getVelocityBetter(), telemetry); // QWC
+            shooter.update(pinpoint.getPose(), pinpoint.getVelocityBetter()); // QWC
 
             Fate.log("Util/LoopMs", loopTime.milliseconds());
             loopTime.reset();
