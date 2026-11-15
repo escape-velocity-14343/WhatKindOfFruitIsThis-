@@ -306,8 +306,8 @@ public class ShooterSubsystem extends SubsystemBase {
         //this.rail.set(state.element);
         flywheel.setTargetVelocity(state.flywheelAngVel);
         rollers.setTargetVelocity(state.rollerAngVel);
-        telemetry.addData("roller velocity", state.rollerAngVel);
-        telemetry.addData("flywheel velocity", state.flywheelAngVel);
+        //telemetry.addData("roller velocity", state.rollerAngVel);
+        //telemetry.addData("flywheel velocity", state.flywheelAngVel);
         Fate.log("Shooter/TargetState", state, shooterStateSchema);
         Fate.log("Shooter/CurrentState", new ShooterState(
                 flywheel.getCurrentVelocity(),

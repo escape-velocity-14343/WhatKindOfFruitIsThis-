@@ -183,13 +183,13 @@ public class CompetitionTeleOp extends LinearOpMode {
                 shooter.isUsingRollers = false;
             }
 
-            else if ((gamepad1.right_trigger > 0.5) | (angleToGoal>=angleThreshold | angleToGoal<=-angleThreshold)
+            else if ((gamepad1.right_trigger > 0.5) | ((angleToGoal>=angleThreshold | angleToGoal<=-angleThreshold)
                     && readyToShoot
                     && shooter.state.turretAngle.into(Degrees) < 170
                     && shooter.state.turretAngle.into(Degrees) > -170
                     && readyToShoot
                     && shooter.state.turretAngle.into(Degrees) < 170
-                    && shooter.state.turretAngle.into(Degrees) > -170) {
+                    && shooter.state.turretAngle.into(Degrees) > -170)) {
                 intake.setPower(intakePhaseTimer.seconds() > intakePhaseSeconds ? 0 : 1);
                 if (intakePhaseTimer.seconds() > intakePhaseSeconds + intakePhasePeriodSeconds) {
                     intakePhaseTimer.reset();
@@ -219,7 +219,7 @@ public class CompetitionTeleOp extends LinearOpMode {
                 imu.resetYaw();
                 pinpoint.resetIMU();
                 if (gamepad1.dpad_down){
-                    pinpoint.setPose(new Pose2d(-63.4,63.4, Rotation2d.fromDegrees(0)));
+                    pinpoint.setPose(new Pose2d(-63.4,-63.4, Rotation2d.fromDegrees(0)));
                 }
             }
 
