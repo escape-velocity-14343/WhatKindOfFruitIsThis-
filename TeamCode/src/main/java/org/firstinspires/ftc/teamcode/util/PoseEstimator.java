@@ -48,7 +48,7 @@ public class PoseEstimator<T> {
                 double delta = AngleUnit.normalizeRadians(end.getRotation().getRadians() - start.getRotation().getRadians());
 
                 return new Pose2d(trans, new Rotation2d(start.getRotation().getRadians() + delta * t));
-            });
+            }, new Pose2d());
 
     // Maps timestamps to vision updates
     // Always contains one entry before the oldest entry in m_odometryPoseBuffer, unless there have

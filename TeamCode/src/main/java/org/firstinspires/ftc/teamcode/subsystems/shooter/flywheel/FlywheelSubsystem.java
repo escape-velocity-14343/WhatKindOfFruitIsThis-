@@ -7,21 +7,25 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import gay.zharel.fastlane.VoltageCache;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.FlywheelBaseSubsystem;
 
+import java.util.function.BooleanSupplier;
+
 @Config
 public class FlywheelSubsystem extends FlywheelBaseSubsystem {
     public static FlywheelConfiguration config = new FlywheelConfiguration(
             0.00975,
-            0.0055,
+            0.22,
             0.001,
             0.00003,
             1.0 / 28.0,
+            0.95,
+            0.97,
             FlywheelMode.VELOCITY_CONTROL,
             "Flywheel"
     );
 
     public static double toleranceRPM = 100.0;
-    public FlywheelSubsystem(HardwareMap hardwareMap) {
-        super(config,
+    public FlywheelSubsystem(HardwareMap hardwareMap, BooleanSupplier isPollen) {
+        super(config, isPollen,
                 hardwareMap.get(DcMotorEx.class, "flywheelMotor"));
 
         this.flywheelMotors.get(0).setDirection(DcMotorSimple.Direction.REVERSE);

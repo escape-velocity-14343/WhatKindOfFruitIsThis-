@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import java.util.function.BooleanSupplier;
+
 import dev.nextftc.units.measuretypes.AngularVelocity;
 import gay.zharel.fastlane.VoltageCache;
 
@@ -18,6 +20,8 @@ public class CounterrollerSubsystem extends FlywheelBaseSubsystem {
             0.00005,
             0.000001,
             (1.0 / 28.0) * (31.0 / 28.0),
+            0.95,
+            0.97,
             FlywheelMode.VELOCITY_CONTROL,
             "Counterroller"
     );
@@ -28,8 +32,8 @@ public class CounterrollerSubsystem extends FlywheelBaseSubsystem {
     public static AngularVelocity getTargetRPMByElement(boolean isPollen) {
         return RotationsPerMinute.of(isPollen ? pollenRPM : nectarRPM);
     }
-    public CounterrollerSubsystem(HardwareMap hardwareMap) {
-        super(config,
+    public CounterrollerSubsystem(HardwareMap hardwareMap, BooleanSupplier isPollen) {
+        super(config, isPollen,
                 hardwareMap.get(DcMotorEx.class, "counterrollerMotor"));
 
         this.flywheelMotors.get(0).setDirection(DcMotorSimple.Direction.REVERSE);

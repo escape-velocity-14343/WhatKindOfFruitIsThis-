@@ -7,6 +7,8 @@ import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Utility;
+
+import org.firstinspires.ftc.teamcode.subsystems.shooter.rail.RailSubsystem2;
 import org.firstinspires.ftc.teamcode.subsystems.transfer.TransferSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.CounterrollerSubsystem;
@@ -47,6 +49,8 @@ public class ShooterTuner extends LinearOpMode {
 
         ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap, telemetry);
 
+        RailSubsystem2 rail = new RailSubsystem2(hardwareMap);
+
         if (enableIntakeTransfer) {
             intake = new IntakeSubsystem(hardwareMap);
             transfer = new TransferSubsystem(hardwareMap, () -> isPollen);
@@ -84,6 +88,12 @@ public class ShooterTuner extends LinearOpMode {
             shooter.hood.setAngle(Degrees.of(hoodDegrees));
             shooter.turret.setDegrees(turretDegrees);
             //shooter.rail.set(element);
+
+            if (element == ShooterSubsystem.ShooterElement.POLLEN) {
+                rail.pollen();
+            } else {
+                rail.nectar();
+            }
 
             telemetry.addData("Flywheel RPM", shooter.flywheel.getCurrentVelocity().into(RotationsPerMinute));
             telemetry.addData("Target Flywheel RPM", flywheelPowerOrRpm);

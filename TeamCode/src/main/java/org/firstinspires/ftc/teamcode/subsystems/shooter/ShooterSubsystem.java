@@ -85,7 +85,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public static double[] nectarDistances = new double[]{
             48,
             51,
-            53,
+            55, // 9 / 11
             67, //not very good
             93, // absolutely not
             ////
@@ -100,7 +100,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public static double[] nectarFlywheelRpms = new double[]{
             -3100,
             -3100,
-            -3100,
+            -2900,
             -3400,
             -3900,
             ////
@@ -115,7 +115,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public static double[] nectarRollerRpms = new double[]{
             -4900,
             -4900,
-            -4900,
+            -5100,
             -4900,
             -5700,
             ////
@@ -150,7 +150,7 @@ public class ShooterSubsystem extends SubsystemBase {
             1.0
     };
 
-    public static boolean enableSOTM = true;
+    public static boolean enableSOTM = false;
     public static double offsetSeconds = 0.0875;
 
     public TunableInterpLUT pollenVelocity = new TunableInterpLUT();
@@ -253,8 +253,8 @@ public class ShooterSubsystem extends SubsystemBase {
         nectarTOF.mY = Arrays.stream(nectarTOFSeconds).boxed().collect(Collectors.toList());
         nectarTOF.createLUT();
 
-        this.rollers = new CounterrollerSubsystem(hardwareMap);
-        this.flywheel = new FlywheelSubsystem(hardwareMap);
+        this.rollers = new CounterrollerSubsystem(hardwareMap, isPollen);
+        this.flywheel = new FlywheelSubsystem(hardwareMap, isPollen);
         this.hood = new HoodSubsystem(hardwareMap);
         //this.rail = new RailSubsystem(hardwareMap);
         this.turret = new TurretSubsystem(hardwareMap);
@@ -265,6 +265,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void setPollenSupplier(BooleanSupplier isPollen) {
         this.isPollen = isPollen;
+        this.rollers.isPollen = isPollen;
+        this.flywheel.isPollen = isPollen;
     }
 
     /**
@@ -322,6 +324,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public ShooterState calculateTargetShooterState(Pose2d robotPose) {
 
         PoseVelocity2d robotVelocity = velocityInterpolator.getData(TimeSource.getTimestamp() - offsetSeconds);
+
 
         Fate.log("Shooter/RobotVel", new Pose2d(
                 robotVelocity.linearVel.x.into(InchesPerSecond),

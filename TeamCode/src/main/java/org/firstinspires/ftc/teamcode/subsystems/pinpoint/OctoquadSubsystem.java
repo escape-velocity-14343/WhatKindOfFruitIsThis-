@@ -18,6 +18,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.teamcode.subsystems.LoggingConstants;
+import org.firstinspires.ftc.teamcode.util.TimeSource;
 import org.firstinspires.ftc.teamcode.util.TimestampedData;
 
 import static dev.nextftc.units.Units.*;
@@ -29,6 +30,8 @@ import static org.firstinspires.ftc.teamcode.subsystems.lib.Util.Pose2dConverter
 public class OctoquadSubsystem extends PinpointSubsystem {
     public static int xPort = 0;
     public static int yPort = 1;
+    public static float headingScalar = 1.0185f;
+    public static int velocityMs = 100;
     public OctoQuad.LocalizerStatus octoquadStatus = OctoQuad.LocalizerStatus.NOT_INITIALIZED;
     public OctoQuad.LocalizerDataBlock latestData = new OctoQuad.LocalizerDataBlock();
     public Pose2D latestVel = new Pose2D(DistanceUnit.MM, 0, 0, AngleUnit.RADIANS, 0);
@@ -37,6 +40,8 @@ public class OctoquadSubsystem extends PinpointSubsystem {
     public OctoquadSubsystem(HardwareMap hMap) {
         this.octoquad = hMap.get(OctoQuadImpl.class, "octoquad");
         octoquad.setCachingMode(OctoQuad.CachingMode.MANUAL);
+
+        octoquad.setLocalizerImuHeadingScalar(headingScalar);
 
         octoquad.setLocalizerPortX(xPort);
         octoquad.setLocalizerPortY(yPort);
@@ -50,9 +55,7 @@ public class OctoquadSubsystem extends PinpointSubsystem {
         octoquad.setLocalizerTcpOffsetMM_X((float) (xEncOffset * 25.4));
         octoquad.setLocalizerTcpOffsetMM_Y((float) (yEncOffset * 25.4));
 
-        octoquad.setLocalizerVelocityIntervalMS(20);
-
-        octoquad.setLocalizerVelocityIntervalMS(20);
+        octoquad.setLocalizerVelocityIntervalMS(velocityMs);
     }
 
     @Override
@@ -81,7 +84,7 @@ public class OctoquadSubsystem extends PinpointSubsystem {
             Log.i("%11", "octoquad NaN value");
         } else {
             pose = output;
-            currentTimestamp = System.nanoTime();
+            currentTimestamp = TimeSource.getTimestampNanos();
             lastGoodPose = pose;
             latestData = data;
             latestVel = output_v;

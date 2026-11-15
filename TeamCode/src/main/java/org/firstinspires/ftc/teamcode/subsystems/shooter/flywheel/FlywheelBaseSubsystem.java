@@ -4,11 +4,14 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.SimpleMotorFeedforward;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import dev.nextftc.units.measuretypes.AngularVelocity;
 import gay.zharel.fateweaver.telemetry.Fate;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 import static dev.nextftc.units.Units.*;
 import static gay.zharel.fastlane.UnitsKt.AppliedThrottle;
@@ -22,14 +25,17 @@ public class FlywheelBaseSubsystem extends SubsystemBase {
     }
 
     public static class FlywheelConfiguration {
-        public double kV, kS, kP, kD, rotationsPerTick;
+        public double kV, kS, kP, kD, rotationsPerTick, kLowPassPollen, kLowPassNectar;
         public FlywheelMode mode;
         public final String name;
-        public FlywheelConfiguration(double kV, double kS, double kP, double kD, double rotationsPerTick, FlywheelMode mode, String name) {
+        public FlywheelConfiguration(double kV, double kS, double kP, double kD, double rotationsPerTick, double kLowPassPollen, double kLowPassNectar,
+                                     FlywheelMode mode, String name) {
             this.kV = kV;
             this.kS = kS;
             this.kP = kP;
             this.kD = kD;
+            this.kLowPassPollen = kLowPassPollen;
+            this.kLowPassNectar = kLowPassNectar;
             this.rotationsPerTick = rotationsPerTick;
             this.mode = mode;
             this.name = name;
@@ -41,14 +47,19 @@ public class FlywheelBaseSubsystem extends SubsystemBase {
     private SimpleMotorFeedforward velFF;
     private AngularVelocity targetVelocity = RotationsPerMinute.of(0.0);
     private AngularVelocity currentVelocity = RotationsPerSecond.of(0.0);
+    private int lastTicks = 0;
+    private double lastTicksPerSecond = 0;
+    private ElapsedTime timeSince = new ElapsedTime();
+    public BooleanSupplier isPollen = null;
 
     protected final List<DcMotorEx> flywheelMotors;
 
     /**
      * Leader is first motor
      */
-    public FlywheelBaseSubsystem(FlywheelConfiguration config, DcMotorEx... flywheelMotors) {
+    public FlywheelBaseSubsystem(FlywheelConfiguration config, BooleanSupplier isPollen, DcMotorEx... flywheelMotors) {
         this.config = config;
+        this.isPollen = isPollen;
 
         velPid = new PIDController(config.kP, 0.0, config.kD);
         velFF = new SimpleMotorFeedforward(config.kS, config.kV, 0.0);
@@ -58,9 +69,22 @@ public class FlywheelBaseSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        int currentTicks = flywheelMotors.get(0).getCurrentPosition();
+        int deltaTicks = currentTicks - lastTicks;
+
+        double lowPass = config.kLowPassPollen;
+        if (isPollen != null) {
+            lowPass = isPollen.getAsBoolean() ? config.kLowPassPollen : config.kLowPassNectar;
+        }
+
+        lastTicksPerSecond = flywheelMotors.get(0).getVelocity() * lowPass + (deltaTicks / timeSince.seconds()) * (1 - lowPass);
+
+        timeSince.reset();
+        lastTicks = currentTicks;
+
         // compute current velocity
         // ticks per second * rotations per tick
-        currentVelocity = RotationsPerSecond.of(flywheelMotors.get(0).getVelocity() * config.rotationsPerTick);
+        currentVelocity = RotationsPerSecond.of(lastTicksPerSecond * config.rotationsPerTick);
 
         switch (config.mode) {
             case VELOCITY_CONTROL:

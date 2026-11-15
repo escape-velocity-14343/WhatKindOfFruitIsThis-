@@ -1,5 +1,6 @@
 package gay.zharel.fastlane
 
+import com.acmerobotics.dashboard.config.Config
 import dev.nextftc.units.Volts
 import dev.nextftc.units.unittypes.VoltageUnit
 
@@ -9,6 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime
 import dev.nextftc.control.geometry.Vector2d
 import dev.nextftc.units.Measure
 
+@Config
 /**
  * Global object for synchronized and IO-efficient voltage reads.
  */
@@ -26,7 +28,7 @@ object VoltageCache {
 
     val currentVoltage: Double
         get() {
-            if (timeElapsed.seconds() > readIntervalSeconds) {
+            if (readIntervalSeconds > 0 && timeElapsed.seconds() > readIntervalSeconds) {
                 cachedVoltage = voltageSensor.voltage
                 timeElapsed.reset()
             }
