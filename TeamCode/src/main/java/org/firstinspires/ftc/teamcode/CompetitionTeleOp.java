@@ -82,7 +82,7 @@ public class CompetitionTeleOp extends LinearOpMode {
         TransferSubsystem transfer = new TransferSubsystem(hardwareMap, rail::getIsPollen);
         ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap, telemetry);
         shooter.setPollenSupplier(rail::getIsPollen);
-        PinpointSubsystem pinpoint = new PinpointSubsystem(hardwareMap);
+        OctoquadSubsystem pinpoint = new OctoquadSubsystem(hardwareMap);
         RampSpoolSubsystem spool = new RampSpoolSubsystem(hardwareMap);
         ColorSensorSubsystem colorSensor = new ColorSensorSubsystem(hardwareMap);
         //VisionSubsystem vision = new VisionSubsystem(hardwareMap, telemetry);

@@ -224,7 +224,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public DataInterpolator<PoseVelocity2d> velocityInterpolator = new DataInterpolator<PoseVelocity2d>(
             PoseVelocity2d::plus,
-            PoseVelocity2d::times
+            PoseVelocity2d::times,
+            PoseVelocity2d.zero
     );
     private Telemetry telemetry;
     public ShooterSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {

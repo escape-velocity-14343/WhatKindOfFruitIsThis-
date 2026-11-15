@@ -14,14 +14,16 @@ public class DataInterpolator<T> {
 
     private final Function3<Double, T, T, T> lerp;
     private double KEEP_SECONDS = -1.0;
+    private final T defaultVal;
 
-    public DataInterpolator(BiFunction<T, T, T> addition, BiFunction<T, Double, T> scalarMult) {
+    public DataInterpolator(BiFunction<T, T, T> addition, BiFunction<T, Double, T> scalarMult, T defaultVal) {
         this((Double t, T e1, T e2) ->
-            addition.apply(scalarMult.apply(e1, 1-t), scalarMult.apply(e2, t)));
+            addition.apply(scalarMult.apply(e1, 1-t), scalarMult.apply(e2, t)), defaultVal);
     }
 
-    public DataInterpolator(Function3<Double, T, T, T> lerp) {
+    public DataInterpolator(Function3<Double, T, T, T> lerp, T defaultVal) {
         this.lerp = lerp;
+        this.defaultVal = defaultVal;
     }
 
     public void addData(TimestampedData<T> data) {
@@ -37,7 +39,7 @@ public class DataInterpolator<T> {
         // clear out oldest
         int i = data.size() - 1;
         double currSeconds = TimeSource.getTimestamp();
-        while (data.get(i).seconds < currSeconds - KEEP_SECONDS) {
+        while (i > 0 && data.get(i).seconds < currSeconds - KEEP_SECONDS) {
             data.remove(i);
             i--;
         }
@@ -51,6 +53,11 @@ public class DataInterpolator<T> {
         clearOld();
 
         int i = 0;
+
+        if (data.isEmpty()) {
+            return defaultVal;
+        }
+
         T out = data.get(0).data; // latest entry
         Fate.log("DataLerp/Size", data.size());
         Fate.log("DataLerp/First", data.get(0).seconds);
