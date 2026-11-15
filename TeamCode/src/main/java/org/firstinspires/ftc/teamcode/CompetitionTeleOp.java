@@ -23,6 +23,7 @@ import android.util.Size;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.teamcode.subsystems.pinpoint.OctoquadSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.vision.VisionSubsystem;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -79,7 +80,7 @@ public class CompetitionTeleOp extends LinearOpMode {
         TransferSubsystem transfer = new TransferSubsystem(hardwareMap, rail::getIsPollen);
         ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap);
         shooter.setPollenSupplier(rail::getIsPollen);
-        PinpointSubsystem pinpoint = new PinpointSubsystem(hardwareMap);
+        OctoquadSubsystem pinpoint = new OctoquadSubsystem(hardwareMap);
         RampSpoolSubsystem spool = new RampSpoolSubsystem(hardwareMap);
         ColorSensorSubsystem colorSensor = new ColorSensorSubsystem(hardwareMap);
         VisionSubsystem vision = new VisionSubsystem(hardwareMap, telemetry);

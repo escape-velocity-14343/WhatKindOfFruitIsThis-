@@ -11,7 +11,7 @@ public class LocalizationTest extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        PinpointSubsystem pinpoint = new PinpointSubsystem(hardwareMap);
+        OctoquadSubsystem pinpoint = new OctoquadSubsystem(hardwareMap);
         MecanumDriveSubsystem mecanum = new MecanumDriveSubsystem(hardwareMap, () -> pinpoint.getHeading().getRadians());
 
         pinpoint.reset();

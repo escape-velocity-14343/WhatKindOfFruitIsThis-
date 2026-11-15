@@ -12,14 +12,16 @@ public class DataInterpolator<T> {
     public List<TimestampedData<T>> data = new ArrayList<>();
 
     private final Function3<Double, T, T, T> lerp;
+    private final T defaultVal;
 
-    public DataInterpolator(BiFunction<T, T, T> addition, BiFunction<T, Double, T> scalarMult) {
+    public DataInterpolator(BiFunction<T, T, T> addition, BiFunction<T, Double, T> scalarMult, T defaultVal) {
         this((Double t, T e1, T e2) ->
-            addition.apply(scalarMult.apply(e1, 1-t), scalarMult.apply(e2, t)));
+            addition.apply(scalarMult.apply(e1, 1-t), scalarMult.apply(e2, t)), defaultVal);
     }
 
-    public DataInterpolator(Function3<Double, T, T, T> lerp) {
+    public DataInterpolator(Function3<Double, T, T, T> lerp, T defaultVal) {
         this.lerp = lerp;
+        this.defaultVal = defaultVal;
     }
 
     public void addData(TimestampedData<T> data) {
@@ -29,6 +31,11 @@ public class DataInterpolator<T> {
 
     public T getData(double seconds) {
         int i = 0;
+
+        if (data.isEmpty()) {
+            return defaultVal;
+        }
+
         T out = data.get(0).data; // latest entry
         while (i <= data.size() - 1 && seconds - data.get(i).seconds < 0) {
             i++;

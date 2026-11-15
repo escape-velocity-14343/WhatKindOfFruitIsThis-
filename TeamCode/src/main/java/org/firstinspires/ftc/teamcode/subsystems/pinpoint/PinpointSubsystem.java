@@ -38,10 +38,12 @@ public class PinpointSubsystem extends SubsystemBase {
 
     public static boolean flipX = false;
     public static boolean flipY = true;
+
+    // inches
     public static double xEncOffset = 2.8;
     public static double yEncOffset = -3.8;
 
-    private Pose2D lastGoodPose = new Pose2D(INCH, 0, 0, AngleUnit.DEGREES, 0);
+    protected    Pose2D lastGoodPose = new Pose2D(INCH, 0, 0, AngleUnit.DEGREES, 0);
     public long currentTimestamp = 0;
     //FieldD fieldDrawing = new FieldDrawing();
     double turretOffsetX = -81 / 25.4;
@@ -68,6 +70,10 @@ public class PinpointSubsystem extends SubsystemBase {
         // reset();
         deviceStatus = pinpoint.getDeviceStatus();
         //fieldDrawing = new FieldDrawing();
+    }
+
+    public PinpointSubsystem() {
+
     }
 
     @Override
