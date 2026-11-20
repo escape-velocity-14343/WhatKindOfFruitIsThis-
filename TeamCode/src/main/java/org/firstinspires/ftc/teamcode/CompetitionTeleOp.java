@@ -77,7 +77,6 @@ public class CompetitionTeleOp extends LinearOpMode {
         for (LynxModule hub : hubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
-        HoodSubsystem2 hood = new HoodSubsystem2(hardwareMap);
         RailSubsystem2 rail = new RailSubsystem2(hardwareMap);
         IntakeSubsystem intake = new IntakeSubsystem(hardwareMap);
         TransferSubsystem transfer = new TransferSubsystem(hardwareMap, rail::getIsPollen);
@@ -148,7 +147,7 @@ public class CompetitionTeleOp extends LinearOpMode {
                 isDown = !isDown;
             }
             //shooter.flywheel.setTargetVelocity(RotationsPerMinute.of(shooterVelocity));
-            hood.max();
+//            hood.max();
 
             if (gamepad2.a || gamepad1.a){
                 rail.pollen();

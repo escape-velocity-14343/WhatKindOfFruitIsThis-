@@ -28,7 +28,7 @@ public class ShooterTuner extends LinearOpMode {
 
     public static double flywheelPowerOrRpm = 0.0;
     public static double counterrollerPowerOrRpm = 0.0;
-    public static double hoodDegrees = 0.0;
+    public static double hoodPos = 0.0;
     public static double turretDegrees = 0.0;
     public static ShooterSubsystem.ShooterElement element = ShooterSubsystem.ShooterElement.POLLEN;
     public static boolean enableIntakeTransfer = true;
@@ -85,7 +85,7 @@ public class ShooterTuner extends LinearOpMode {
                 transfer.off();
             }
 
-            shooter.hood.setAngle(Degrees.of(hoodDegrees));
+            shooter.hood.setServo(hoodPos);
             shooter.turret.setDegrees(turretDegrees);
             //shooter.rail.set(element);
 

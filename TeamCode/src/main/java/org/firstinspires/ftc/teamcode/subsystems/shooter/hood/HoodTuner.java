@@ -13,10 +13,10 @@ public class HoodTuner extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        HoodSubsystem2 hood = new HoodSubsystem2(hardwareMap);
+        HoodSubsystem hood = new HoodSubsystem(hardwareMap);
         waitForStart();
         while (opModeIsActive()) {
-            hood.setPos(position);
+            hood.setServo(position);
             telemetry.addData("target position", position);
             //telemetry.addData("current position", hood.curPos());
             telemetry.update();

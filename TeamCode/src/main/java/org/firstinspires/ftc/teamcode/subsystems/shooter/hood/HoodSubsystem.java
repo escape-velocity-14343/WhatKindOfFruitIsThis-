@@ -36,27 +36,8 @@ public class HoodSubsystem extends SubsystemBase {
         this.hoodServo.setPosition(pos);
     }
 
-    public void setAngle(Angle angle) {
-        setServo(getServoValueFromAngle(angle));
-
-        this.angle = angle;
-
-        Fate.log("Shooter/Hood/Degrees", angle.into(Degrees));
-        Fate.log("Shooter/Hood/ServoValue", hoodServo.getPosition());
-    }
-
-    private double getServoValueFromAngle(Angle angle) {
-        Angle minAngle = Degrees.of(hoodMinDegrees);
-        Angle maxAngle = Degrees.of(hoodMaxDegrees);
-
-        return angle
-                .minus(minAngle)
-                .div((Measure<? extends AngleUnit>) maxAngle.minus(minAngle));
-    }
-
     @Override
     public void periodic() {
-        Fate.log("Shooter/Hood/Degrees", angle.into(Degrees));
         Fate.log("Shooter/Hood/ServoValue", hoodServo.getPosition());
     }
 
