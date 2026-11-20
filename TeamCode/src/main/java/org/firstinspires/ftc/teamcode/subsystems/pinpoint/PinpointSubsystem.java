@@ -39,7 +39,7 @@ public class PinpointSubsystem extends SubsystemBase {
     GoBildaPinpointDriver.DeviceStatus deviceStatus = GoBildaPinpointDriver.DeviceStatus.NOT_READY;
 
     public static boolean flipX = true;
-    public static boolean flipY = true;
+    public static boolean flipY = false;
     // inches
     public static double xEncOffset = 2.5;
     public static double yEncOffset = -3.5;

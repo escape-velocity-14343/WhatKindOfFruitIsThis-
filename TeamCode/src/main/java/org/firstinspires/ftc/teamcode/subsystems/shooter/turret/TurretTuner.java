@@ -13,12 +13,12 @@ public class TurretTuner extends LinearOpMode{
     @Override
     public void runOpMode() {
         TurretSubsystem turret = new TurretSubsystem(hardwareMap);
-        AnalogInput encoder = hardwareMap.analogInput.get("turretEncoder");
+//        AnalogInput encoder = hardwareMap.analogInput.get("turretEncoder");
         waitForStart();
 
         while (opModeIsActive()) {
             turret.setDegrees(DESIRED_POSITION);
-            telemetry.addData("Analog Position", encoder.getVoltage());
+//            telemetry.addData("Analog Position", encoder.getVoltage());
             telemetry.addData("Turret Position", DESIRED_POSITION);
             telemetry.update();
         }

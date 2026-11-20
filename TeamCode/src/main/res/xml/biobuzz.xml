@@ -6,13 +6,11 @@
             <goBILDA5202SeriesMotor name="transferMotor" port="1" />
             <goBILDA5202SeriesMotor name="counterrollerMotor" port="2" />
             <goBILDA5202SeriesMotor name="flywheelMotor" port="3" />
-            <Servo name="hoodServo" port="5" />
-
         </LynxModule>
         <LynxModule name="Servo Hub" port="3">
             <Servo name="turret1" port="0" />
             <Servo name="turret2" port="5" />
-            <Servo name="hood" port="1" />
+            <Servo name="hoodServo" port="1" />
             <Servo name="railServo" port="2" />
             <Servo name="flowerServo" port="3" />
         </LynxModule>a
