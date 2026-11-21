@@ -14,13 +14,8 @@ import static dev.nextftc.units.Units.Degrees;
 @Config
 public class HoodSubsystem extends SubsystemBase {
 
-    // we define 0 degrees as the top of the hood being parallel with the plane of the shooter
-    // another way to say it: all the way down, pointing straight up
-
-    // 90 degrees is pointing straight fowards
-
-    public static double hoodMaxDegrees = 35.0;
-    public static double hoodMinDegrees = 22.0;
+    public static double hoodMaxDegrees = 0.4;
+    public static double hoodMinDegrees = 0.6;
 
     private final Servo hoodServo;
     private Angle angle = Degrees.of(hoodMinDegrees);

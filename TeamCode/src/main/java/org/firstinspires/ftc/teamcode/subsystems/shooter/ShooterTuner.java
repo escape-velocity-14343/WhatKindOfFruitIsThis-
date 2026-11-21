@@ -8,6 +8,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Utility;
 
+import org.firstinspires.ftc.teamcode.subsystems.pinpoint.PinpointSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.rail.RailSubsystem2;
 import org.firstinspires.ftc.teamcode.subsystems.transfer.TransferSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeSubsystem;
@@ -50,6 +51,11 @@ public class ShooterTuner extends LinearOpMode {
         ShooterSubsystem shooter = new ShooterSubsystem(hardwareMap, telemetry);
 
         RailSubsystem2 rail = new RailSubsystem2(hardwareMap);
+
+        PinpointSubsystem pinpoint = new PinpointSubsystem(hardwareMap);
+
+        pinpoint.reset();
+        sleep(500);
 
         if (enableIntakeTransfer) {
             intake = new IntakeSubsystem(hardwareMap);
@@ -100,6 +106,8 @@ public class ShooterTuner extends LinearOpMode {
 
             telemetry.addData("Counterroller RPM", shooter.rollers.getCurrentVelocity().into(RotationsPerMinute));
             telemetry.addData("Target Counterroller RPM", counterrollerPowerOrRpm);
+
+            telemetry.addData("Pinpoint", pinpoint.getPose());
 
             telemetry.update();
         }

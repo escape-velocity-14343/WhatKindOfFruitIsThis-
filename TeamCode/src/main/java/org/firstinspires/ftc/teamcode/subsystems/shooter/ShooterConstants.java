@@ -84,8 +84,6 @@ public class ShooterConstants {
             0.0,
             0.0,
             0.0,
-            0.0,
-            0.0,
     };
 
     public static double[] nectarTOFSeconds = new double[]{
