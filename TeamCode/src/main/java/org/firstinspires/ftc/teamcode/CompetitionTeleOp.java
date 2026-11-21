@@ -65,7 +65,8 @@ public class CompetitionTeleOp extends LinearOpMode {
     boolean lastX = false;
     boolean lastY = false;
     public static boolean readyToShoot = false;
-    public static int angleThreshold = 45;
+    public static double autoshootYThresholdMultiplier = 1;
+    public static double autoshootMinDistance = 10.0;
     //public static double flywheelVelocity
 
     @Override
@@ -106,14 +107,11 @@ public class CompetitionTeleOp extends LinearOpMode {
         while (opModeIsActive()) {
             Translation2d differenceBetweenPoses = PositionConstants.getGoalPose().getTranslation().minus(pinpoint.getPose().getTranslation());
             double angleToGoal = (Math.toDegrees(Math.atan2(differenceBetweenPoses.getY(), differenceBetweenPoses.getX())));
+            boolean autoshootThing = Math.abs(pinpoint.getPose().getY()) > Math.abs(pinpoint.getPose().getX());
             //pinpoint.getPose().getTranslation().getDistance()
             telemetry.addData("angle", angleToGoal);
             telemetry.addData("turret angle", shooter.state.turretAngle.into(Degrees));
             telemetry.addData("readyToShoot", readyToShoot);
-            telemetry.addData("autoshoot", (angleToGoal>=angleThreshold)
-                    && readyToShoot
-                    && shooter.state.turretAngle.into(Degrees) < 170
-                    && shooter.state.turretAngle.into(Degrees) > -170);
 
             for (LynxModule hub : hubs) {
                 hub.clearBulkCache();
@@ -183,10 +181,9 @@ public class CompetitionTeleOp extends LinearOpMode {
                 shooter.isUsingRollers = false;
             }
 
-            else if ((gamepad1.right_trigger > 0.5) | ((angleToGoal>=angleThreshold | angleToGoal<=-angleThreshold)
-                    && readyToShoot
-                    && shooter.state.turretAngle.into(Degrees) < 170
-                    && shooter.state.turretAngle.into(Degrees) > -170
+            else if ((gamepad1.right_trigger > 0.5) ||
+                    (Math.abs(pinpoint.getPose().getY()) > Math.max(autoshootYThresholdMultiplier * Math.abs(pinpoint.getPose().getX()),
+                            PositionConstants.goalY + autoshootMinDistance)
                     && readyToShoot
                     && shooter.state.turretAngle.into(Degrees) < 170
                     && shooter.state.turretAngle.into(Degrees) > -170)) {

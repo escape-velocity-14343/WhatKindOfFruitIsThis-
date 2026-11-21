@@ -41,9 +41,11 @@ import static org.firstinspires.ftc.teamcode.subsystems.shooter.ShooterConstants
 // smaller ones do all the everything else ok thank you bye
 public class    ShooterSubsystem extends SubsystemBase {
     public TunableInterpLUT pollenVelocity = new TunableInterpLUT();
+    public TunableInterpLUT pollenRollerRpm = new TunableInterpLUT();
     public TunableInterpLUT pollenHood = new TunableInterpLUT();
     public TunableInterpLUT pollenTOF = new TunableInterpLUT();
     public TunableInterpLUT nectarVelocity = new TunableInterpLUT();
+    public TunableInterpLUT nectarRollerRpm = new TunableInterpLUT();
     public TunableInterpLUT nectarHood = new TunableInterpLUT();
     public TunableInterpLUT nectarTOF = new TunableInterpLUT();
     public boolean isUsingRollers = false;
@@ -53,9 +55,15 @@ public class    ShooterSubsystem extends SubsystemBase {
         return isPollen.getAsBoolean() ? pollenVelocity : nectarVelocity;
     }
 
+    public TunableInterpLUT getRollerUsing() {
+        return isPollen.getAsBoolean() ? pollenRollerRpm : nectarRollerRpm;
+    }
+
     public TunableInterpLUT getHoodUsing() {
         return isPollen.getAsBoolean() ? pollenHood : nectarHood;
     }
+
+
 
     /**
      * which thing are we shooting
@@ -218,7 +226,9 @@ public class    ShooterSubsystem extends SubsystemBase {
         AngularVelocity flywheelVelocity = RotationsPerMinute.of(getFlywheelUsing().get(Range.clip(robotPose.getTranslation().getDistance(PositionConstants.getGoalPose().getTranslation())
                 , min(pollenDistances[0], nectarDistances[0]) + 0.1,
                 Math.max(pollenDistances[pollenDistances.length - 1], nectarDistances[nectarDistances.length - 1]) - 0.1)));
-        AngularVelocity rollerVelocity = pollen ? RotationsPerMinute.of(pollenRollerRpm) : RotationsPerMinute.of(nectarRollerRpm);
+        AngularVelocity rollerVelocity = RotationsPerMinute.of(getRollerUsing().get(Range.clip(robotPose.getTranslation().getDistance(PositionConstants.getGoalPose().getTranslation()),
+                min(pollenDistances[0], nectarDistances[0]) + 0.1,
+                Math.max(pollenDistances[pollenDistances.length - 1], nectarDistances[nectarDistances.length - 1]) - 0.1)));
 
         double hoodAngle = getHoodUsing().get(Range.clip(robotPose.getTranslation().getDistance(PositionConstants.getGoalPose().getTranslation()),
                 min(pollenDistances[0], nectarDistances[0]) + 0.1,
@@ -240,6 +250,10 @@ public class    ShooterSubsystem extends SubsystemBase {
         pollenVelocity.mY = Arrays.stream(pollenFlywheelRpms).boxed().collect(Collectors.toList());
         pollenVelocity.createLUT();
 
+        pollenRollerRpm.mX = Arrays.stream(pollenDistances).boxed().collect(Collectors.toList());
+        pollenRollerRpm.mY = Arrays.stream(pollenRollerRpms).boxed().collect(Collectors.toList());
+        pollenRollerRpm.createLUT();
+
         pollenHood.mX = Arrays.stream(pollenDistances).boxed().collect(Collectors.toList());
         pollenHood.mY = Arrays.stream(pollenHoodPoses).boxed().collect(Collectors.toList());
         pollenHood.createLUT();
@@ -251,6 +265,10 @@ public class    ShooterSubsystem extends SubsystemBase {
         nectarVelocity.mX = Arrays.stream(nectarDistances).boxed().collect(Collectors.toList());
         nectarVelocity.mY = Arrays.stream(nectarFlywheelRpms).boxed().collect(Collectors.toList());
         nectarVelocity.createLUT();
+
+        nectarRollerRpm.mX = Arrays.stream(nectarDistances).boxed().collect(Collectors.toList());
+        nectarRollerRpm.mY = Arrays.stream(nectarRollerRpms).boxed().collect(Collectors.toList());
+        nectarRollerRpm.createLUT();
 
         nectarHood.mX = Arrays.stream(nectarDistances).boxed().collect(Collectors.toList());
         nectarHood.mY = Arrays.stream(nectarHoodPoses).boxed().collect(Collectors.toList());
