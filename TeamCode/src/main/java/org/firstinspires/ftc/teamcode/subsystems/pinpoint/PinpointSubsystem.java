@@ -41,8 +41,8 @@ public class PinpointSubsystem extends SubsystemBase {
     public static boolean flipX = false;
     public static boolean flipY = true;
     // inches
-    public static double xEncOffset = -3.5;
-    public static double yEncOffset = -3;
+    public static double xEncOffset = 3;
+    public static double yEncOffset = -2.3;
 
     protected    Pose2D lastGoodPose = new Pose2D(INCH, 0, 0, AngleUnit.DEGREES, 0);
     public long currentTimestamp = 0;

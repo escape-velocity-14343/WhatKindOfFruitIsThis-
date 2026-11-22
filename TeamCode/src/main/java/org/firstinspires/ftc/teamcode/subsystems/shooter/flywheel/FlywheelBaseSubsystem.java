@@ -77,7 +77,18 @@ public class FlywheelBaseSubsystem extends SubsystemBase {
             lowPass = isPollen.getAsBoolean() ? config.kLowPassPollen : config.kLowPassNectar;
         }
 
-        lastTicksPerSecond = flywheelMotors.get(0).getVelocity() * lowPass + (deltaTicks / timeSince.seconds()) * (1 - lowPass);
+        double calculatedTps = (deltaTicks / timeSince.seconds());
+        double motorTps = flywheelMotors.get(0).getVelocity();
+
+        Fate.log("Shooter/" + config.name + "/calculatedTps", calculatedTps);
+        Fate.log("Shooter/" + config.name + "/motorTps", motorTps);
+
+        if (motorTps != 0 &&
+                0.5 > calculatedTps / motorTps || 1.5 < calculatedTps / motorTps) {
+            lastTicksPerSecond = motorTps;
+        } else {
+            lastTicksPerSecond = motorTps * lowPass + calculatedTps * (1 - lowPass);
+        }
 
         timeSince.reset();
         lastTicks = currentTicks;
@@ -118,6 +129,7 @@ public class FlywheelBaseSubsystem extends SubsystemBase {
     }
 
     public void setPower(double power) {
+        Fate.log("Shooter/" + config.name + "/power", power);
         flywheelMotors.forEach((m) -> m.setPower(power));
     }
 

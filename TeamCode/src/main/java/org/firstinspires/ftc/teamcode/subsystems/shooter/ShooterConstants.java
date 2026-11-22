@@ -5,17 +5,19 @@ import com.acmerobotics.dashboard.config.Config;
 @Config
 public class ShooterConstants {
     public static double[] pollenDistances = new double[]{
-            33.0,
-            36.0,
-            55.0,
+            33.0, // retuned
+            36.0, // retuned
+            55.0, // retuned
+            63.0,
             73.0,
             86.0
     };
 
     public static double[] pollenFlywheelRpms = new double[]{
             -2600.0,
+            -2800.0,
+            -2850.0,
             -2600.0,
-            -2500.0,
             -2900.0,
             -3100.0,
     };
@@ -24,21 +26,24 @@ public class ShooterConstants {
             4300,
             4700,
             4300,
+            4300,
             4500,
             5000,
     };
 
     public static double[] pollenHoodPoses = new double[]{
-            0.585,
+            0.4,
+            0.4,
+            0.53,
+            0.55,
             0.6,
-            0.4,
-            0.4,
-            0.4,
+            0.6,
     };
 
     public static double[] pollenTOFSeconds = new double[]{
             0.6521,
             0.6521,
+            0.726,
             0.726,
             0.85,
             0.85

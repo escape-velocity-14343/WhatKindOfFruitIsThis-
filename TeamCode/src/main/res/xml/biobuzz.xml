@@ -23,6 +23,7 @@
             <goBILDAPinpoint name="pinpoint" port="0" bus="1"/>
             <RevColorSensorV3 name="ballSensor" port="1" bus="0"/>
             <AnalogInput name="turretEncoder" port="3"/>
+            <Servo name="hoodServo2" port="0"/>
         </LynxModule>
     </LynxUsbDevice>
 </Robot>

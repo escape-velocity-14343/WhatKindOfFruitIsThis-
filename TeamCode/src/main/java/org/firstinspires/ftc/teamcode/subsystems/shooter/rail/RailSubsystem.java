@@ -14,8 +14,8 @@ import static dev.nextftc.units.Units.Degrees;
 
 @Config
 public class RailSubsystem extends SubsystemBase {
-    public static double railPollenPos = 0.0;
-    public static double railNectarPos = 1.0;
+    public static double railPollenPos = 0.3;
+    public static double railNectarPos = 0.47;
 
     private ShooterSubsystem.ShooterElement element = ShooterSubsystem.ShooterElement.POLLEN;
     private final Servo railServo;

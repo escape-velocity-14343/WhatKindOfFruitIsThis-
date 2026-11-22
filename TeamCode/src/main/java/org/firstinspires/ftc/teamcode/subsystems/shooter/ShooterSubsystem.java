@@ -39,7 +39,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.shooter.ShooterConstants
 @Config
 // ok hello basically this one does all the aiming calculations and the other
 // smaller ones do all the everything else ok thank you bye
-public class    ShooterSubsystem extends SubsystemBase {
+public class ShooterSubsystem extends SubsystemBase {
     public TunableInterpLUT pollenVelocity = new TunableInterpLUT();
     public TunableInterpLUT pollenRollerRpm = new TunableInterpLUT();
     public TunableInterpLUT pollenHood = new TunableInterpLUT();

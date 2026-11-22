@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 @Config
 public class RailSubsystem2 extends SubsystemBase {
-    public static double railPollenPos = 0.4; //0.85;
+    public static double railPollenPos = 0.3; //0.85;
     public static double railNectarPos = 0.5;
     private boolean isPollen = true;
     Servo railServo;

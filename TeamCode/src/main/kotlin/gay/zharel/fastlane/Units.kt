@@ -7,8 +7,14 @@ import dev.nextftc.units.unittypes.VoltageUnit
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.qualcomm.robotcore.hardware.VoltageSensor
 import com.qualcomm.robotcore.util.ElapsedTime
+import com.qualcomm.robotcore.util.Range
 import dev.nextftc.control.geometry.Vector2d
 import dev.nextftc.units.Measure
+import org.firstinspires.ftc.teamcode.VoltageConstants.voltageCeil
+import org.firstinspires.ftc.teamcode.VoltageConstants.voltageFloor
+import gay.zharel.fateweaver.telemetry.Fate
+import gay.zharel.fateweaver.telemetry.log
+import org.firstinspires.ftc.teamcode.VoltageConstants
 
 @Config
 /**
@@ -20,16 +26,13 @@ object VoltageCache {
     private var cachedVoltage: Double = 0.0
     private val timeElapsed: ElapsedTime = ElapsedTime()
 
-    @JvmStatic
-    val nominalVoltage: Double = 12.5
-
-    @JvmStatic
-    val readIntervalSeconds: Double = 0.5
-
     val currentVoltage: Double
         get() {
-            if (readIntervalSeconds > 0 && timeElapsed.seconds() > readIntervalSeconds) {
-                cachedVoltage = voltageSensor.voltage
+            if (VoltageConstants.voltageReadSeconds > 0 && timeElapsed.seconds() > VoltageConstants.voltageCeil) {
+                val trueVoltage = voltageSensor.voltage
+                Fate.log("Voltage/TrueVoltage", trueVoltage);
+                cachedVoltage = Range.clip(trueVoltage, voltageFloor, voltageCeil)
+                Fate.log("Voltage/Voltage", cachedVoltage);
                 timeElapsed.reset()
             }
             return cachedVoltage
@@ -56,7 +59,7 @@ val AppliedThrottle = VoltageUnit(Volts,
 
 // normalized, do not clamp!
 @JvmField
-val Throttle = VoltageUnit(Volts, VoltageCache.nominalVoltage,
+val Throttle = VoltageUnit(Volts, VoltageConstants.nominalVoltage,
     "throttle", "thrN")
 
 data class PoseVoltage2d(

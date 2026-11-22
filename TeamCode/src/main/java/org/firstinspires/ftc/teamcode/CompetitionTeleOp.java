@@ -99,6 +99,7 @@ public class CompetitionTeleOp extends LinearOpMode {
         boolean lastA = false;
         CommandScheduler.getInstance().cancelAll();
         waitForStart();
+        spool.raise();
         ElapsedTime loopTime = new ElapsedTime();
         ElapsedTime colorSensorTime = new ElapsedTime();
         ElapsedTime intakePhaseTimer = new ElapsedTime();

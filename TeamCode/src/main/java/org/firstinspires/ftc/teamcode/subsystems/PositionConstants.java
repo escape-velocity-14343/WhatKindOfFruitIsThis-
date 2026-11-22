@@ -17,7 +17,7 @@ import gay.zharel.fateweaver.schemas.DoubleSchema;
 @Config
 public class PositionConstants {
     public static double goalX = -12.2;  // -12.75
-    public static double goalY = 8.5820411442;
+    public static double goalY = 14;
 
     public static double goalXOffset = 0;
     public static double goalYOffset = 0;

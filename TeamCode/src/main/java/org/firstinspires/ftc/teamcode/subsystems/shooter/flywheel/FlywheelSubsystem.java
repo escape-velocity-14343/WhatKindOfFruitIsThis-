@@ -13,7 +13,7 @@ import java.util.function.BooleanSupplier;
 public class FlywheelSubsystem extends FlywheelBaseSubsystem {
     public static FlywheelConfiguration config = new FlywheelConfiguration(
             0.00975,
-            0.08,
+            0.05,
             0.001,
             0.00003,
             1.0 / 28.0,
