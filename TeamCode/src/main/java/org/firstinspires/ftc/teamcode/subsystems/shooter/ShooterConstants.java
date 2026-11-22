@@ -5,39 +5,35 @@ import com.acmerobotics.dashboard.config.Config;
 @Config
 public class ShooterConstants {
     public static double[] pollenDistances = new double[]{
-            33.0, // retuned
-            36.0, // retuned
-            55.0, // retuned
-            63.0,
-            73.0,
-            86.0
+            33,
+            50,
+            58,
+            72,
+            91
     };
 
     public static double[] pollenFlywheelRpms = new double[]{
-            -2600.0,
-            -2800.0,
-            -2850.0,
-            -2600.0,
-            -2900.0,
-            -3100.0,
+            -2800,
+            -2850,
+            -2900,
+            -3000,
+            -3350
     };
 
     public static double[] pollenRollerRpms = new double[]{
             4300,
-            4700,
             4300,
             4300,
-            4500,
-            5000,
+            4450,
+            4500
     };
 
     public static double[] pollenHoodPoses = new double[]{
-            0.4,
-            0.4,
-            0.53,
+            0.47,
+            0.5,
+            0.52,
             0.55,
-            0.6,
-            0.6,
+            0.56
     };
 
     public static double[] pollenTOFSeconds = new double[]{
@@ -45,54 +41,39 @@ public class ShooterConstants {
             0.6521,
             0.726,
             0.726,
-            0.85,
             0.85
     };
 
     public static double[] nectarDistances = new double[]{
-            48,
+            33,
             51,
-            55, // 9 / 11
-            67, //not very good
-            93, // absolutely not
-            ////
-            //37.3,
-            //45.7,
-            //53.0,
-            //58.0,
-            //68.0,
-            //75.0
+            59,
+            73,
+            92
     };
 
     public static double[] nectarFlywheelRpms = new double[]{
             -3100,
-            -3100,
-            -2900,
+            -3250,
             -3400,
-            -3900,
-            ////
-            //-2800.0,
-            //-2800.0,
-            //-3000.0,
-            //-3025.0,
-            //-3100.0,
-            //-3300.0
+            -3650,
+            -3950
     };
 
     public static double[] nectarRollerRpms = new double[]{
+            4400,
             4300,
-            4700,
-            4300,
-            4500,
-            5000,
+            4400,
+            4450,
+            4450
     };
 
     public static double[] nectarHoodPoses = new double[]{
-            0.5,
-            0.5,
-            0.5,
-            0.5,
-            0.5,
+            .52,
+            .56,
+            .56,
+            .56,
+            .58
     };
 
     public static double[] nectarTOFSeconds = new double[]{
