@@ -9,6 +9,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.LoggingConstants;
 import org.firstinspires.ftc.teamcode.subsystems.vision.CameraBaseSubsystem;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagClusterDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary;
@@ -40,6 +41,8 @@ public class ApriltagSubsystem extends CameraBaseSubsystem {
                     0, true
             )
     );
+    public boolean redHiveState = true;
+    public boolean blueHiveState = false;
 
     public ArrayList<Pose2d> poses = new ArrayList<>();
 
@@ -57,12 +60,57 @@ public class ApriltagSubsystem extends CameraBaseSubsystem {
         ArrayList<AprilTagDetection> detections = aprilTagProcessor.getDetections();
         Fate.log(getFateLogName() + "/Detections", detections == null ? 0 : detections.size());
 
-        poses.clear();
+        int numDetections = detections.size();
+        for (int i = 0; i < numDetections; i++) {
+            AprilTagDetection detection = detections.get(i);
 
-        for (int i = 0; i < detections.size(); i++) {
-            poses.add(convertApriltagPoseToPose2d(detections.get(i)));
-            Fate.log(getFateLogName() + "/Detection/" + i + "/Pose", poses.get(i),
-                    LoggingConstants.poseSchema);
+            // Tip detection
+            if (detection instanceof AprilTagClusterDetection) {
+                AprilTagClusterDetection cluster = (AprilTagClusterDetection) detection;
+                String name = cluster.metadata.name.toUpperCase();
+                double pitch = detection.ftcPose.pitch;
+
+                if (name.toUpperCase().equals("RED AUDIENCE")) {
+                    redHiveState = true;
+                }
+                else if (name.toUpperCase().equals("RED SCORING")) {
+                    redHiveState = false;
+                }
+
+                if (name.toUpperCase().equals("BLUE AUDIENCE")) {
+                    blueHiveState = false;
+                }
+                else if (name.toUpperCase().equals("BLUE SCORING")) {
+                    blueHiveState = true;
+                }
+
+                /*
+                if (name.equals("RED AUDIENCE")) {
+                    if (pitch > 0.0) {
+                        redHiveState = false;
+                    }
+                    else redHiveState = true;
+                }
+                else if (name.equals("RED SCORING")) {
+                    if (pitch > 0.0) {
+                        redHiveState = true;
+                    }
+                    else redHiveState = false;
+                }
+                else if (name.equals("BLUE AUDIENCE")) {
+                    if (pitch > 0.0) {
+                        blueHiveState = false;
+                    }
+                    else blueHiveState = true;
+                }
+                else if (name.equals("BLUE SCORING")) {
+                    if (pitch > 0.0) {
+                        blueHiveState = true;
+                    }
+                    else blueHiveState = false;
+                }
+                */
+            }
         }
     }
 

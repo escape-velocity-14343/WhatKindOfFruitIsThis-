@@ -14,7 +14,7 @@ public class TransferOnCommand extends CommandBase {
     }
     @Override
     public void initialize(){
-        transferSubsystem.setPower(1);
+        transferSubsystem.transfer();
         intakeSubsystem.setPower(1);
     }
     @Override
