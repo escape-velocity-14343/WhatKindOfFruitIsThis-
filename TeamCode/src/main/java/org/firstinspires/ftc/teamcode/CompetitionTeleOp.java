@@ -71,6 +71,7 @@ public class CompetitionTeleOp extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        ShooterSubsystem.isAuton = false;
         CommandScheduler.getInstance().reset();
         telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), telemetry);
 

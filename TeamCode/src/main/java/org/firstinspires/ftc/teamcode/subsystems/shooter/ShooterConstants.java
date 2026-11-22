@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class ShooterConstants {
+    public static int autoOffset = -200;
     public static double[] pollenDistances = new double[]{
             33,
             50,
@@ -13,11 +14,11 @@ public class ShooterConstants {
     };
 
     public static double[] pollenFlywheelRpms = new double[]{
-            -2800,
-            -2850,
-            -2900,
-            -3000,
-            -3350
+            -2800 + autoOffset,
+            -2850 + autoOffset,
+            -2900 + autoOffset,
+            -3000 + autoOffset,
+            -3350 + autoOffset
     };
 
     public static double[] pollenRollerRpms = new double[]{

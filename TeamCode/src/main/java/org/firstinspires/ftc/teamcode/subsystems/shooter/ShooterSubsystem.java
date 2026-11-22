@@ -9,8 +9,11 @@ import com.arcrobotics.ftclib.geometry.Translation2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 import dev.nextftc.control.geometry.PoseVelocity2d;
+import dev.nextftc.units.Unit;
+import dev.nextftc.units.Units;
 import dev.nextftc.units.measuretypes.Angle;
 import dev.nextftc.units.measuretypes.AngularVelocity;
+import dev.nextftc.units.unittypes.AngularVelocityUnit;
 import gay.zharel.fateweaver.schemas.CustomStructSchema;
 import gay.zharel.fateweaver.schemas.DoubleSchema;
 import gay.zharel.fateweaver.schemas.EnumSchema;
@@ -50,6 +53,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public TunableInterpLUT nectarTOF = new TunableInterpLUT();
     public boolean isUsingRollers = false;
     public BooleanSupplier isPollen = () -> true;
+    public static Boolean isAuton = false;
 
     public TunableInterpLUT getFlywheelUsing() {
         return isPollen.getAsBoolean() ? pollenVelocity : nectarVelocity;
@@ -147,6 +151,11 @@ public class ShooterSubsystem extends SubsystemBase {
      * implement when we start actually aiming! sets all the targets that we want
      */
     public void update(Pose2d robotPose, TimestampedData<PoseVelocity2d> robotVelocity) {
+        if (isAuton){
+            autoOffset = -200;
+        } else{
+            autoOffset = 0;
+        }
         // update luts
         updateLuts();
 

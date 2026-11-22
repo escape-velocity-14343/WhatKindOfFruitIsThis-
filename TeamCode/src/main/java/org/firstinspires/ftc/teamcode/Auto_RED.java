@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.subsystems.drive.GoToPointWithDefaultComma
 import org.firstinspires.ftc.teamcode.subsystems.drive.MecanumDriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.pinpoint.PinpointSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.shooter.ShooterConstants;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.RollersOffCommand;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.flywheel.RollersOnCommand;
@@ -41,8 +42,11 @@ import org.firstinspires.ftc.vision.VisionPortal;
 public class Auto_RED extends LinearOpMode {
     DefaultGoToPointCommand toPoint;
     MecanumDriveSubsystem drive;
+    public static double intakePhaseSeconds = 10;
+
     @Override
     public void runOpMode() throws InterruptedException {
+        ShooterSubsystem.isAuton = true;
         CommandScheduler.getInstance().reset();
         PositionConstants.rightGoalIsUp = true;
         int viewID = VisionPortal.makeMultiPortalView(2, VisionPortal.MultiPortalLayout.VERTICAL)[0];
@@ -56,17 +60,18 @@ public class Auto_RED extends LinearOpMode {
 
         shooter.setPollenSupplier(rail::getIsPollen);
         drive = new MecanumDriveSubsystem(hardwareMap, () -> pinpoint.getHeading().getRadians());
-        toPoint = new DefaultGoToPointCommand(drive, pinpoint, new Pose2d(-28.3, -64.8, Rotation2d.fromDegrees(180)));
+        toPoint = new DefaultGoToPointCommand(drive, pinpoint, new Pose2d(-14.15, -64.8, Rotation2d.fromDegrees(90)));
         spool.raise();
         rail.pollen();
-        shooter.turret.setDegrees(90);
+        shooter.turret.setDegrees(0);
 
-        pinpoint.setPose(new Pose2d(-28.3, -64.8, Rotation2d.fromDegrees(180)));
+        pinpoint.setPose(new Pose2d(-14.15, -64.8, Rotation2d.fromDegrees(90)));
 
         List<LynxModule> hubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : hubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
+        ElapsedTime intakePhaseTimer = new ElapsedTime();
 
         waitForStart();
 
@@ -78,31 +83,35 @@ public class Auto_RED extends LinearOpMode {
                 new SequentialCommandGroup(
                         new WaitCommand(0).andThen(
                         new RollersOnCommand(shooter),
-                        new WaitCommand(200),
+                        new WaitCommand(2000),
+                        new InstantCommand(() -> intake.setPower(intakePhaseTimer.seconds() > intakePhaseSeconds ? 0 : 1)),
+                        new InstantCommand(() -> transfer.setPower(0.35)),
                         //new SmartTransferCommand(shooter, transfer, intake, 2000),
-                        new TransferOnCommand(transfer, intake),
+                        //new TransferOnCommand(transfer, intake),
                         new WaitCommand(1000),
                         //new transfer
                         //new Transf
                         //new InstantCommand(()->transfer.transfer()).alongWith(new InstantCommand(()->intake.setPower(1))).alongWith(new WaitCommand(4000)),
                         new RollersOffCommand(shooter).alongWith(
                                 new TransferOffCommand(transfer, intake).alongWith(
-                                                new InstantCommand(() -> toPoint.maxTranslationPower = 0.4))),
+                                                new InstantCommand(() -> toPoint.maxTranslationPower = 0.6))),
                         new GoToPointWithDefaultCommand(new Pose2d(-58, -64.8, Rotation2d.fromDegrees(180)), toPoint, 3.0, 10.0),
-                        new WaitCommand(2000),
-                        new GoToPointWithDefaultCommand(new Pose2d(-28.3, -64.8, Rotation2d.fromDegrees(180)), toPoint),
+                        new WaitCommand(1000),
+                        new GoToPointWithDefaultCommand(new Pose2d(-14.15, -64.8, Rotation2d.fromDegrees(90)), toPoint),
 
                         new RollersOnCommand(shooter),
-                        new WaitCommand(100),
+                        new WaitCommand(1000),
                         //new SmartTransferCommand(shooter, transfer, intake, 2000),
-                        new TransferOnCommand(transfer, intake),
+                        ////new TransferOnCommand(transfer, intake),
+                        new InstantCommand(() -> intake.setPower(intakePhaseTimer.seconds() > intakePhaseSeconds ? 0 : 1)),
+                        new InstantCommand(() -> transfer.transfer()),
                         new WaitCommand(1000),
                         new RollersOffCommand(shooter).alongWith(
                                 new TransferOffCommand(transfer, intake)),
 
                         new GoToPointWithDefaultCommand(new Pose2d(-44.5, -24.5, Rotation2d.fromDegrees(180)), toPoint, 3, 10),
                         new LowerRampCommand(spool),
-                        new GoToPointWithDefaultCommand(new Pose2d(-55, -24.5, Rotation2d.fromDegrees(180)), toPoint, 3.0, 10.0),
+                        new GoToPointWithDefaultCommand(new Pose2d(-57, -24.5, Rotation2d.fromDegrees(180)), toPoint, 3.0, 10.0),
                         new WaitCommand(1000),
                         new GoToPointWithDefaultCommand(new Pose2d(-44.5, -24.5, Rotation2d.fromDegrees(180)), toPoint, 3, 10),
                         new RaiseRampCommand(spool),
@@ -110,27 +119,34 @@ public class Auto_RED extends LinearOpMode {
                         new GoToPointWithDefaultCommand(new Pose2d(-37, 56, Rotation2d.fromDegrees(90)), toPoint),
 
                         new RollersOnCommand(shooter),
-                        new WaitCommand(100),
-                        //new SmartTransferCommand(shooter, transfer, intake, 2000),
-                        new TransferOnCommand(transfer, intake),
                         new WaitCommand(1000),
+                        //new SmartTransferCommand(shooter, transfer, intake, 2000),
+                        //new TransferOnCommand(transfer, intake),
+                        new InstantCommand(() -> intake.setPower(intakePhaseTimer.seconds() > intakePhaseSeconds ? 0 : 1)),
+                        new InstantCommand(() -> transfer.transfer()),
+                        new WaitCommand(3000),
                         new RollersOffCommand(shooter).alongWith(
                                 new TransferOffCommand(transfer, intake)),
 
-                        new GoToPointWithDefaultCommand(new Pose2d(-20, 50, Rotation2d.fromDegrees(90)), toPoint),
+                        new GoToPointWithDefaultCommand(new Pose2d(-18, 50, Rotation2d.fromDegrees(90)), toPoint),
                         new LowerRampCommand(spool),
-                        new GoToPointWithDefaultCommand(new Pose2d(-20, 55, Rotation2d.fromDegrees(90)), toPoint),
+                        new GoToPointWithDefaultCommand(new Pose2d(-18, 59, Rotation2d.fromDegrees(90)), toPoint),
+                        new WaitCommand(3000),
+                        new GoToPointWithDefaultCommand(new Pose2d(-18, 50, Rotation2d.fromDegrees(90)), toPoint),
+                        new WaitCommand(1000),
                         new RaiseRampCommand(spool),
 
                         new RollersOnCommand(shooter),
-                        new WaitCommand(100),
-                        //new SmartTransferCommand(shooter, transfer, intake, 2000),
-                        new TransferOnCommand(transfer, intake),
                         new WaitCommand(1000),
+                        //new SmartTransferCommand(shooter, transfer, intake, 2000),
+                        //new TransferOnCommand(transfer, intake),
+                        new InstantCommand(() -> intake.setPower(intakePhaseTimer.seconds() > intakePhaseSeconds ? 0 : 1)),
+                        new InstantCommand(() -> transfer.transfer()),
+                        new WaitCommand(2000),
                         new RollersOffCommand(shooter).alongWith(
                                 new TransferOffCommand(transfer, intake)),
 
-                        new GoToPointWithDefaultCommand(new Pose2d(-61, 19, Rotation2d.fromDegrees(-90)), toPoint, 1.0, 5.0))
+                        new GoToPointWithDefaultCommand(new Pose2d(-61, 25, Rotation2d.fromDegrees(-90)), toPoint, 1.0, 5.0))
 
                 ));
                         //new ConditionalCommand(
@@ -141,7 +157,7 @@ public class Auto_RED extends LinearOpMode {
                         //                new WaitCommand(100),
                         //                new WaitCommand(1000),
                         //                //new SmartTransferCommand(shooter, transfer, intake, 2000),
-                        //                new TransferOnCommand(transfer, intake),
+                        ////                new TransferOnCommand(transfer, intake),
                         //                new WaitCommand(2000),
                         //                new RollersOffCommand(shooter),
                         //
@@ -328,9 +344,16 @@ public class Auto_RED extends LinearOpMode {
             for (LynxModule hub : hubs) {
                 hub.clearBulkCache();
             }
-
+            PositionConstants.rightGoalIsUp = !(pinpoint.getTranslation().getY() > 5);
             CommandScheduler.getInstance().run();
             shooter.update(pinpoint.getPose(), pinpoint.getVelocityBetter());
+            shooter.flywheel.periodic();
+            shooter.rollers.periodic();
+            telemetry.addData("flywheel TARGET velocity", shooter.flywheel.getCurrentTargetVelocity());
+            telemetry.addData("flywheel REAL velocity", shooter.flywheel.getCurrentVelocity());
+            telemetry.addData("roller TARGET velocity", shooter.rollers.getCurrentTargetVelocity());
+            telemetry.addData("roller REAL velocity", shooter.rollers.getCurrentTargetVelocity());
+            telemetry.addData("auto offset", ShooterConstants.autoOffset);
             Fate.log("Util/LoopMs", loopTime.milliseconds());
             loopTime.reset();
             telemetry.update();
