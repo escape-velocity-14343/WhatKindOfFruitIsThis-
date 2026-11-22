@@ -78,7 +78,7 @@ public class Auto_RED extends LinearOpMode {
                 new SequentialCommandGroup(
                         new WaitCommand(0).andThen(
                         new RollersOnCommand(shooter),
-                        new WaitCommand(1100),
+                        new WaitCommand(200),
                         //new SmartTransferCommand(shooter, transfer, intake, 2000),
                         new TransferOnCommand(transfer, intake),
                         new WaitCommand(1000),
@@ -102,7 +102,7 @@ public class Auto_RED extends LinearOpMode {
 
                         new GoToPointWithDefaultCommand(new Pose2d(-44.5, -24.5, Rotation2d.fromDegrees(180)), toPoint, 3, 10),
                         new LowerRampCommand(spool),
-                        new GoToPointWithDefaultCommand(new Pose2d(-54, -24.5, Rotation2d.fromDegrees(180)), toPoint, 3.0, 10.0),
+                        new GoToPointWithDefaultCommand(new Pose2d(-55, -24.5, Rotation2d.fromDegrees(180)), toPoint, 3.0, 10.0),
                         new WaitCommand(1000),
                         new GoToPointWithDefaultCommand(new Pose2d(-44.5, -24.5, Rotation2d.fromDegrees(180)), toPoint, 3, 10),
                         new RaiseRampCommand(spool),
@@ -119,7 +119,7 @@ public class Auto_RED extends LinearOpMode {
 
                         new GoToPointWithDefaultCommand(new Pose2d(-20, 50, Rotation2d.fromDegrees(90)), toPoint),
                         new LowerRampCommand(spool),
-                        new GoToPointWithDefaultCommand(new Pose2d(-37, 50, Rotation2d.fromDegrees(90)), toPoint),
+                        new GoToPointWithDefaultCommand(new Pose2d(-20, 55, Rotation2d.fromDegrees(90)), toPoint),
                         new RaiseRampCommand(spool),
 
                         new RollersOnCommand(shooter),
